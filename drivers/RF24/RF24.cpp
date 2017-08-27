@@ -346,7 +346,8 @@ LOCAL void RF24_irqHandler(void)
 		// rx coming in during our stay will not be handled and will cause characters to be lost.
 		// As a workaround we re-enable interrupts to allow nested processing of other interrupts.
 		// Our own handler is disconnected to prevent recursive calling of this handler.
-#if defined(MY_GATEWAY_SERIAL) && !defined(__linux__)
+		// This workaround is not required for Linux and SAMD architecture.
+#if defined(MY_GATEWAY_SERIAL) && !defined(__linux__) && !defined(ARDUINO_ARCH_SAMD)
 		detachInterrupt(digitalPinToInterrupt(MY_RF24_IRQ_PIN));
 		interrupts();
 #endif
@@ -357,11 +358,16 @@ LOCAL void RF24_irqHandler(void)
 
 		// Start checking if RX-FIFO is not empty, as we might end up here from an interrupt
 		// for a message we've already read.
-		while (RF24_isDataAvailable()) {
-			RF24_receiveCallback();		// Must call RF24_readMessage(), which will clear RX_DR IRQ !
+		while (true) {
+			if (RF24_isDataAvailable()) {
+				RF24_receiveCallback();		// Must call RF24_readMessage(), which will clear RX_DR IRQ !
+			} else {
+				RF24_setStatus(_BV(RF24_RX_DR)); // In this case we also have to clear RX_DR IRQ !
+				break;
+			}
 		}
 		// Restore our interrupt handler.
-#if defined(MY_GATEWAY_SERIAL) && !defined(__linux__)
+#if defined(MY_GATEWAY_SERIAL) && !defined(__linux__) && !defined(ARDUINO_ARCH_SAMD)
 		noInterrupts();
 		attachInterrupt(digitalPinToInterrupt(MY_RF24_IRQ_PIN), RF24_irqHandler, FALLING);
 #endif
