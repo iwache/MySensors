@@ -491,7 +491,11 @@
 #if defined(ARDUINO_ARCH_ESP8266)
 #define MY_RF24_CE_PIN 4
 #elif defined(ARDUINO_ARCH_SAMD)
+#if defined(ARDUINO_SAMD_MKR1000) || defined(ARDUINO_SAMD_MKRZERO) || defined(ARDUINO_SAMD_MKRFox1200)
+#define MY_RF24_CE_PIN 3
+#else
 #define MY_RF24_CE_PIN 27
+#endif
 #elif defined(LINUX_ARCH_RASPBERRYPI)
 #define MY_RF24_CE_PIN 22
 #else
@@ -507,7 +511,11 @@
 #if defined(ARDUINO_ARCH_ESP8266)
 #define MY_RF24_CS_PIN 15
 #elif defined(ARDUINO_ARCH_SAMD)
+#if defined(ARDUINO_SAMD_MKR1000) || defined(ARDUINO_SAMD_MKRZERO) || defined(ARDUINO_SAMD_MKRFox1200)
+#define MY_RF24_CS_PIN 4
+#else
 #define MY_RF24_CS_PIN 3
+#endif
 #elif defined(LINUX_ARCH_RASPBERRYPI)
 #define MY_RF24_CS_PIN 24
 #else
@@ -773,6 +781,7 @@
 //#define MY_GATEWAY_ENC28J60
 //#define MY_GATEWAY_ESP8266
 //#define MY_GATEWAY_LINUX
+//#define MY_GATEWAY_WIFI101
 
 /**
  * @def MY_PORT

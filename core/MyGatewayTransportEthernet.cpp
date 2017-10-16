@@ -40,7 +40,7 @@ typedef struct {
 	uint8_t idx;
 } inputBuffer;
 
-#if defined(MY_GATEWAY_ESP8266)
+#if defined(MY_GATEWAY_ESP8266) || defined(MY_GATEWAY_WIFI101)
 // Some re-defines to make code more readable below
 #define EthernetServer WiFiServer
 #define EthernetClient WiFiClient
@@ -49,6 +49,9 @@ typedef struct {
 #if defined(MY_IP_ADDRESS)
 IPAddress _gatewayIp(MY_IP_GATEWAY_ADDRESS);
 IPAddress _subnetIp(MY_IP_SUBNET_ADDRESS);
+#if defined(MY_GATEWAY_WIFI101)
+IPAddress _dnsIp(MY_IP_DNS_ADDRESS);
+#endif
 #endif
 #endif
 
@@ -72,6 +75,10 @@ static inputBuffer inputString[MY_GATEWAY_MAX_CLIENTS];
 #else
 static EthernetClient client = EthernetClient();
 static inputBuffer inputString;
+#endif
+
+#if defined(MY_GATEWAY_WIFI101)
+uint8_t wifi101Status = WL_IDLE_STATUS;
 #endif
 
 #ifndef MY_IP_ADDRESS
@@ -100,7 +107,34 @@ void _w5100_spi_en(bool enable)
 bool gatewayTransportInit(void)
 {
 	_w5100_spi_en(true);
-#if defined(MY_GATEWAY_ESP8266)
+
+#if defined(MY_GATEWAY_WIFI101)
+	// check for the presence of the shield:
+	if (WiFi.status() == WL_NO_SHIELD)
+	{
+		debug(PSTR("Eth: WiFi101 shield not present\n"));
+		return false;  // don't continue
+	} 
+#ifdef MY_IP_ADDRESS
+	WiFi.config(_ethernetGatewayIP, _dnsIp, _gatewayIp, _subnetIp);
+#endif
+	// attempt to connect to Wifi network:
+	while (wifi101Status != WL_CONNECTED)
+	{ 
+		debug(PSTR("Eth: Attempting to connect to SSID: "));
+//TODO:
+		MY_SERIALDEVICE.println(MY_WIFI_SSID);
+		// Connect to WPA/WPA2 network. Change this line if using open or WEP network:    
+		wifi101Status = WiFi.begin(MY_WIFI_SSID, MY_WIFI_PASSWORD);
+		// wait 10 seconds for connection:
+		delay(10000);
+	}
+	// print your WiFi shield's IP address:
+	debug(PSTR("Eth: IP Address: "));
+	IPAddress ip = WiFi.localIP();
+//TODO:
+	MY_SERIALDEVICE.println(ip); 
+#elif defined(MY_GATEWAY_ESP8266)
 #if defined(MY_ESP8266_SSID)
 	// Turn off access point
 	WiFi.mode (WIFI_STA);
@@ -135,7 +169,7 @@ bool gatewayTransportInit(void)
 	MY_SERIALDEVICE.println(Ethernet.localIP());
 	// give the Ethernet interface a second to initialize
 	delay(1000);
-#endif /* MY_GATEWAY_ESP8266 */
+#endif /* MY_GATEWAY_WIFI101... */
 
 #ifdef MY_USE_UDP
 	_ethernetServer.begin(_ethernetGatewayPort);
@@ -215,14 +249,19 @@ bool gatewayTransportSend(MyMessage &message)
 		}
 	}
 #else
-	nbytes = _ethernetServer.write(_ethernetMsg);
+	if (!client.connected()) {
+		client.stop();
+	}
+	else {
+		nbytes = client.write(_ethernetMsg, strlen(_ethernetMsg));
+	}
 #endif
 #endif /* MY_GATEWAY_CLIENT_MODE */
 	_w5100_spi_en(false);
 	return (nbytes > 0);
 }
 
-#if (defined(MY_GATEWAY_ESP8266) || defined(MY_GATEWAY_LINUX)) && !defined(MY_GATEWAY_CLIENT_MODE)
+#if (defined(MY_GATEWAY_ESP8266)|| defined(MY_GATEWAY_LINUX)) && !defined(MY_GATEWAY_CLIENT_MODE)
 bool _readFromClient(uint8_t i)
 {
 	while (clients[i].connected() && clients[i].available()) {
@@ -378,8 +417,38 @@ bool gatewayTransportAvailable(void)
 			return true;
 		}
 	}
+#elif defined(MY_GATEWAY_WIFI101)
+	// WiFi101 module does not have hasClient-method. We can only serve one client at the time.
+	if (client) {
+		if (!client.connected()) {
+			debug(PSTR("Eth: disconnect\n"));
+			client.stop();
+		} else {
+			if (_readFromClient()) {
+				setIndication(INDICATION_GW_RX);
+				_w5100_spi_en(false);
+				return true;
+			}
+		}
+	}
+	else
+	{
+		EthernetClient newclient = _ethernetServer.available();
+		// if a new client connects make sure to dispose any previous existing sockets
+		if (newclient) {
+			if (client != newclient) {
+				client.stop();
+				client = newclient;
+				debug(PSTR("Eth: connect\n"));
+				_w5100_spi_en(false);
+				gatewayTransportSend(buildGw(_msgTmp, I_GATEWAY_READY).set(MSG_GW_STARTUP_COMPLETE));
+				_w5100_spi_en(true);
+				presentNode();
+			}
+		}
+	}
 #else
-	// W5100/ENC module does not have hasClient-method. We can only serve one client at the time.
+	// W5100/ENC/WiFi101 module does not have hasClient-method. We can only serve one client at the time.
 	EthernetClient newclient = _ethernetServer.available();
 	// if a new client connects make sure to dispose any previous existing sockets
 	if (newclient) {
@@ -405,7 +474,7 @@ bool gatewayTransportAvailable(void)
 			}
 		}
 	}
-#endif /* MY_GATEWAY_ESP8266 */
+#endif /* MY_GATEWAY_ESP8266 ... */
 #endif
 	_w5100_spi_en(false);
 	return false;
@@ -417,7 +486,7 @@ MyMessage& gatewayTransportReceive(void)
 	return _ethernetMsg;
 }
 
-#if !defined(MY_IP_ADDRESS) && !defined(MY_GATEWAY_ESP8266) && !defined(MY_GATEWAY_LINUX)
+#if !defined(MY_IP_ADDRESS) && !defined(MY_GATEWAY_ESP8266) && !defined(MY_GATEWAY_WIFI101) && !defined(MY_GATEWAY_LINUX)
 void gatewayTransportRenewIP(void)
 {
 	/* renew/rebind IP address
