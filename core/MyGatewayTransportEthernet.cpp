@@ -52,7 +52,11 @@ MyMessage _ethernetMsg;
 #define ARRAY_SIZE(x)  (sizeof(x)/sizeof(x[0]))
 
 typedef struct {
+	// Suppress the warning about unused members in this struct because it is used through a complex
+	// set of preprocessor directives
+	// cppcheck-suppress unusedStructMember
 	char string[MY_GATEWAY_MAX_RECEIVE_LENGTH];
+	// cppcheck-suppress unusedStructMember
 	uint8_t idx;
 } inputBuffer;
 
@@ -155,7 +159,10 @@ bool gatewayTransportInit(void)
 #if defined(MY_IP_ADDRESS)
 	WiFi.config(_ethernetGatewayIP, _gatewayIp, _subnetIp);
 #endif /* End of MY_IP_ADDRESS */
-	(void)WiFi.begin(MY_ESP8266_SSID, MY_ESP8266_PASSWORD);
+#ifndef MY_ESP8266_BSSID
+#define MY_ESP8266_BSSID NULL
+#endif
+	(void)WiFi.begin(MY_ESP8266_SSID, MY_ESP8266_PASSWORD, 0, MY_ESP8266_BSSID);
 	while (WiFi.status() != WL_CONNECTED) {
 		wait(500);
 		MY_SERIALDEVICE.print(F("."));

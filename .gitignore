@@ -10,3 +10,4 @@ bin
 *.sublime-workspace
 .idea
 .vscode
+doxygen.log
