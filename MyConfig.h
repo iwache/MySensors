@@ -1284,12 +1284,15 @@
  * @brief Define this for Ethernet GW based on the ESP8266.
  * @def MY_GATEWAY_LINUX
  * @brief Define this for Ethernet GW based on Linux.
+ * @def MY_GATEWAY_WIFI101
+ * @brief Define this for Ethernet GW based on Arduino WiFi101 (MKR1000).
  */
 // The gateway options available
 //#define MY_GATEWAY_W5100
 //#define MY_GATEWAY_ENC28J60
 //#define MY_GATEWAY_ESP8266
 //#define MY_GATEWAY_LINUX
+//#define MY_GATEWAY_WIFI101
 
 /**
  * @def MY_PORT
@@ -1719,7 +1722,7 @@
  * MY_IS_GATEWAY is true when @ref MY_GATEWAY_FEATURE is set.
  * MY_NODE_TYPE contain a string describing the class of sketch/node (gateway/repeater/node).
  */
-#if defined(MY_GATEWAY_SERIAL) || defined(MY_GATEWAY_W5100) || defined(MY_GATEWAY_ENC28J60) || defined(MY_GATEWAY_ESP8266) || defined(MY_GATEWAY_LINUX) || defined(MY_GATEWAY_MQTT_CLIENT)
+#if defined(MY_GATEWAY_SERIAL) || defined(MY_GATEWAY_W5100) || defined(MY_GATEWAY_ENC28J60) || defined(MY_GATEWAY_ESP8266) || defined(MY_GATEWAY_LINUX) || defined(MY_GATEWAY_WIFI101) || defined(MY_GATEWAY_MQTT_CLIENT)
 #define MY_GATEWAY_FEATURE
 #define MY_IS_GATEWAY (true)
 #define MY_NODE_TYPE "GW"
@@ -1841,6 +1844,7 @@
 #define MY_GATEWAY_ENC28J60
 #define MY_GATEWAY_ESP8266
 #define MY_GATEWAY_LINUX
+#define MY_GATEWAY_WIFI101
 #define MY_IP_ADDRESS 192,168,178,66
 #define MY_USE_UDP
 #define MY_CONTROLLER_IP_ADDRESS 192,168,178,254

@@ -185,7 +185,10 @@ MY_DEFAULT_RX_LED_PIN in your sketch instead to enable LEDs
 #if !defined(MY_PORT)
 #error You must define MY_PORT (controller or gatway port to open)
 #endif
-#if defined(MY_GATEWAY_ESP8266)
+#if defined(MY_GATEWAY_WIFI101)
+// GATEWAY - WiFi101
+#include "core/MyGatewayTransportEthernet.cpp"
+#elif defined(MY_GATEWAY_ESP8266)
 // GATEWAY - ESP8266
 #include "core/MyGatewayTransportEthernet.cpp"
 #elif defined(MY_GATEWAY_LINUX)

@@ -78,7 +78,15 @@ static __inline__ uint8_t __disableIntsRetVal(void)
  */
 static __inline__ void __priMaskRestore(const uint32_t *priMask)
 {
+#if defined(ARDUINO_SAMD_MKR1000) || defined(ARDUINO_SAMD_MKRZERO) || defined(ARDUINO_SAMD_MKRFox1200)
+	if (*priMask == 0) {
+		__enable_irq();
+		// http://infocenter.arm.com/help/topic/com.arm.doc.dai0321a/BIHBFEIB.html
+		__ISB();
+	}
+#else
 	__set_PRIMASK(*priMask);
+#endif
 }
 
 #ifndef DOXYGEN

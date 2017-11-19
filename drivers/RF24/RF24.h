@@ -69,7 +69,11 @@
 #elif defined(ARDUINO_ARCH_ESP32)
 #warning not implemented yet
 #elif defined(ARDUINO_ARCH_SAMD)
+#if defined(ARDUINO_SAMD_MKR1000) || defined(ARDUINO_SAMD_MKRZERO) || defined(ARDUINO_SAMD_MKRFox1200)
+#define DEFAULT_RF24_CE_PIN				(3)		//!< DEFAULT_RF24_CE_PIN
+#else
 #define DEFAULT_RF24_CE_PIN				(27)	//!< DEFAULT_RF24_CE_PIN
+#endif
 #elif defined(LINUX_ARCH_RASPBERRYPI)
 #define DEFAULT_RF24_CE_PIN				(22)	//!< DEFAULT_RF24_CE_PIN
 //#define DEFAULT_RF24_CS_PIN			(24)	//!< DEFAULT_RF24_CS_PIN
