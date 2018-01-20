@@ -11,3 +11,5 @@ bin
 .idea
 .vscode
 doxygen.log
+TAGS
+tags
