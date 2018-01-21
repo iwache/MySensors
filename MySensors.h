@@ -193,7 +193,7 @@ MY_DEFAULT_RX_LED_PIN in your sketch instead to enable LEDs
 #endif
 #if defined(MY_GATEWAY_WIFI101)
 // GATEWAY - WiFi101
-#include "core/MyGatewayTransportEthernet.cpp"
+#include "core/MyGatewayTransportWiFi101.cpp"
 #elif defined(MY_GATEWAY_ESP8266)
 // GATEWAY - ESP8266
 #include "core/MyGatewayTransportEthernet.cpp"

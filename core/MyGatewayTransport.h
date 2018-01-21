@@ -45,6 +45,7 @@
 * | | GWT | TIN   | CONNECTING...             | Connecting to router
 * | | GWT | TIN   | IP=%%s                    | IP address [%%s] obtained
 * |!| GWT | TIN   | DHCP FAIL                 | DHCP request failed
+* |!| GWT | TIN   | NO WIFI101 SHIELD         | WiFi101 shield not present
 * | | GWT | TIN   | ETH OK                    | Connected to network
 * |!| GWT | TIN   | ETH FAIL                  | Connection failed
 * | | GWT | TPS   | TOPIC=%%s,MSG SENT        | MQTT message sent on topic [%%s]
