@@ -146,7 +146,7 @@ bool present(const uint8_t sensorId, const uint8_t sensorType, const char *descr
  * @return true Returns true if message reached the first stop on its way to destination.
  */
 bool sendSketchInfo(const char *name, const char *version, const bool ack = false);
-#if !defined(__linux__)
+#if !defined(__linux__) && !defined(WIN32)
 bool sendSketchInfo(const __FlashStringHelper *name, const __FlashStringHelper *version,
                     const bool ack = false);
 #endif
@@ -408,32 +408,61 @@ bool _sendRoute(MyMessage &message);
 * @brief Callback for incoming messages
 * @param message
 */
+#if !defined(WIN32)
+// Visual C++ has no weak function support
 void receive(const MyMessage &message)  __attribute__((weak));
+#else
+extern void receive(const MyMessage &message);
+#endif
 /**
 * @brief Callback for incoming time messages
+* @param value
 */
-void receiveTime(uint32_t)  __attribute__((weak));
+#if !defined(WIN32)
+void receiveTime(uint32_t value)  __attribute__((weak));
+#else
+extern void receiveTime(uint32_t value);
+#endif
 /**
 * @brief Node presentation
 */
+#if !defined(WIN32)
 void presentation(void)  __attribute__((weak));
+#else
+extern void presentation(void);
+#endif
 /**
 * @brief Called before node initialises
 */
+#if !defined(WIN32)
 void before(void) __attribute__((weak));
+#else
+extern void before(void);
+#endif
 /**
 * @brief Called before any hwInitialization is done
 */
-void preHwInit(void) __attribute__((weak));
+#if !defined(WIN32)
+void preHwInit(void) __attribute__((weak)); 
+#else
+extern void preHwInit(void);
+#endif
 /**
 * @brief Called after node initialises but before main loop
 */
+#if !defined(WIN32)
 void setup(void) __attribute__((weak));
+#else
+extern void setup(void);
+#endif
 /**
 * @brief Main loop
 */
+#if !defined(WIN32)
 void loop(void) __attribute__((weak));
-
+#else
+extern void loop(void);
+#endif
 
 // Inline function and macros
 static inline MyMessage& build(MyMessage &msg, const uint8_t destination, const uint8_t sensor,

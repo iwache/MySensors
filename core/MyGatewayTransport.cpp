@@ -56,9 +56,14 @@ inline void gatewayTransportProcess(void)
 				}
 			} else {
 				// Call incoming message callback if available
+#if defined(WIN32)
+				// Visual C++ has no weak function support
+				receive(_msg);
+#else
 				if (receive) {
 					receive(_msg);
 				}
+#endif
 			}
 		} else {
 #if defined(MY_SENSOR_NETWORK)

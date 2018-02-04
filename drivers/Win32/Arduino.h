@@ -76,7 +76,7 @@
 #define bit(b) (1UL << (b))
 
 #define GET_MACRO(_0, _1, _2, NAME, ...) NAME
-#define random(...) GET_MACRO(_0, ##__VA_ARGS__, randMinMax, randMax, rand)(__VA_ARGS__)
+#define random(...) GET_MACRO(_0, __VA_ARGS__, randMinMax, randMax, rand)(__VA_ARGS__)
 
 #ifndef delay
 #define delay _delay_milliseconds

@@ -152,6 +152,7 @@
  * | STM32F1      | F
  * | TEENSY       | T
  * | Linux        | L
+ * | Win32        | W
  * | Unknown      | -
  */
 #if defined(ARDUINO_ARCH_SAMD)
@@ -168,6 +169,8 @@
 #define MY_CAP_ARCH "T"
 #elif defined(__linux__)
 #define MY_CAP_ARCH "L"
+#elif defined(WIN32)
+#define MY_CAP_ARCH "W"
 #else
 #define MY_CAP_ARCH "-"
 #endif

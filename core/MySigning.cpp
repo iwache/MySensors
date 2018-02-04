@@ -25,7 +25,11 @@
 #define SIGNING_PRESENTATION_REQUIRE_WHITELISTING (1 << 1)
 
 #if defined(MY_DEBUG_VERBOSE_SIGNING)
+#if defined(WIN32)
+#define SIGN_DEBUG(x,...) DEBUG_OUTPUT(x, __VA_ARGS__)
+#else
 #define SIGN_DEBUG(x,...) DEBUG_OUTPUT(x, ##__VA_ARGS__)
+#endif
 #else
 #define SIGN_DEBUG(x,...)
 #endif

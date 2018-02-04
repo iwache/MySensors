@@ -35,7 +35,11 @@
 #define SIGNING_IDENTIFIER (1) //HMAC-SHA256
 
 #if defined(MY_DEBUG_VERBOSE_SIGNING)
+#if defined(WIN32)
+#define SIGN_DEBUG(x,...) DEBUG_OUTPUT(x, __VA_ARGS__)
+#else
 #define SIGN_DEBUG(x,...) DEBUG_OUTPUT(x, ##__VA_ARGS__)
+#endif
 static char printStr[65];
 static char i2h(uint8_t i)
 {

@@ -38,6 +38,10 @@
 #define MySensors_h
 
 #ifdef __cplusplus
+#if defined(WIN32)
+// Additional includes for Visual C++ compiler
+#include "drivers/Win32/includes.cpp"
+#endif
 #include <Arduino.h>
 #endif
 
@@ -75,6 +79,8 @@
 #include "hal/architecture/Teensy3/MyHwTeensy3.cpp"
 #elif defined(__linux__)
 #include "hal/architecture/Linux/MyHwLinuxGeneric.cpp"
+#elif defined(WIN32)
+#include "hal/architecture/Win32/MyHwWin32Generic.cpp"
 #endif
 
 // OTA Debug second part, depends on HAL
@@ -111,7 +117,7 @@ MY_DEFAULT_RX_LED_PIN in your sketch instead to enable LEDs
 #if defined(MY_SIGNING_ATSHA204) && defined(MY_SIGNING_SOFT)
 #error Only one signing engine can be activated
 #endif
-#if defined(MY_SIGNING_ATSHA204) && defined(__linux__)
+#if defined(MY_SIGNING_ATSHA204) && (defined(__linux__) || defined(WIN32))
 #error No support for ATSHA204 on this platform
 #endif
 
@@ -203,6 +209,15 @@ MY_DEFAULT_RX_LED_PIN in your sketch instead to enable LEDs
 #include "drivers/Linux/EthernetServer.h"
 #include "drivers/Linux/IPAddress.h"
 #include "core/MyGatewayTransportEthernet.cpp"
+#elif defined(MY_GATEWAY_WIN32)
+// GATEWAY - Generic Windows
+#if defined(MY_USE_UDP)
+#error UDP mode is not available for Windows
+#endif
+#include "drivers/Win32/EthernetClient.h"
+#include "drivers/Win32/EthernetServer.h"
+#include "drivers/Win32/IPAddress.h"
+#include "core/MyGatewayTransportEthernetWin32.cpp"
 #elif defined(MY_GATEWAY_W5100)
 // GATEWAY - W5100
 #include "core/MyGatewayTransportEthernet.cpp"
@@ -246,8 +261,13 @@ MY_DEFAULT_RX_LED_PIN in your sketch instead to enable LEDs
 #else
 #define __RS485CNT 0	//!< __RS485CNT
 #endif
+#if defined(MY_ETHER)
+#define __ETHERCNT 1	//!< __RS485CNT
+#else
+#define __ETHERCNT 0	//!< __RS485CNT
+#endif
 
-#if (__RF24CNT + __NRF5ESBCNT + __RFM69CNT + __RFM95CNT + __RS485CNT > 1)
+#if (__RF24CNT + __NRF5ESBCNT + __RFM69CNT + __RFM95CNT + __RS485CNT + __ETHERCNT > 1)
 #error Only one forward link driver can be activated
 #endif
 #endif //DOXYGEN
@@ -258,7 +278,7 @@ MY_DEFAULT_RX_LED_PIN in your sketch instead to enable LEDs
 #endif
 
 // TRANSPORT INCLUDES
-#if defined(MY_RADIO_RF24) || defined(MY_RADIO_NRF5_ESB) || defined(MY_RADIO_RFM69) || defined(MY_RADIO_RFM95) || defined(MY_RS485)
+#if defined(MY_RADIO_RF24) || defined(MY_RADIO_NRF5_ESB) || defined(MY_RADIO_RFM69) || defined(MY_RADIO_RFM95) || defined(MY_RS485) || defined(MY_ETHER)
 #include "hal/transport/MyTransportHAL.h"
 #include "core/MyTransport.h"
 
@@ -274,7 +294,7 @@ MY_DEFAULT_RX_LED_PIN in your sketch instead to enable LEDs
 // RAM ROUTING TABLE
 #if defined(MY_RAM_ROUTING_TABLE_FEATURE) && defined(MY_REPEATER_FEATURE)
 // activate feature based on architecture
-#if defined(ARDUINO_ARCH_ESP8266) || defined(ARDUINO_ARCH_SAMD) || defined(ARDUINO_ARCH_NRF5) || defined(ARDUINO_ARCH_STM32F1) || defined(TEENSYDUINO) || defined(__linux__)
+#if defined(ARDUINO_ARCH_ESP8266) || defined(ARDUINO_ARCH_SAMD) || defined(ARDUINO_ARCH_NRF5) || defined(ARDUINO_ARCH_STM32F1) || defined(TEENSYDUINO) || defined(__linux__) || defined(WIN32)
 #define MY_RAM_ROUTING_TABLE_ENABLED
 #elif defined(ARDUINO_ARCH_AVR)
 #if defined(__avr_atmega1280__) || defined(__avr_atmega1284__) || defined(__avr_atmega2560__)
@@ -332,7 +352,7 @@ MY_DEFAULT_RX_LED_PIN in your sketch instead to enable LEDs
 #include "hal/transport/MyTransportNRF5_ESB.cpp"
 #elif defined(MY_RS485)
 #if !defined(MY_RS485_HWSERIAL)
-#if defined(__linux__)
+#if defined(__linux__) || defined(WIN32)
 #error You must specify MY_RS485_HWSERIAL for RS485 transport
 #endif
 #include "drivers/AltSoftSerial/AltSoftSerial.cpp"
@@ -351,6 +371,8 @@ MY_DEFAULT_RX_LED_PIN in your sketch instead to enable LEDs
 #endif
 #include "drivers/RFM95/RFM95.cpp"
 #include "hal/transport/MyTransportRFM95.cpp"
+#elif defined(MY_ETHER)
+#include "hal/transport/MyTransportEther.cpp"
 #endif
 
 // PASSIVE MODE
@@ -407,6 +429,8 @@ MY_DEFAULT_RX_LED_PIN in your sketch instead to enable LEDs
 #include "hal/architecture/NRF5/MyMainNRF5.cpp"
 #elif defined(__linux__)
 #include "hal/architecture/Linux/MyMainLinux.cpp"
+#elif defined(WIN32)
+#include "hal/architecture/Win32/MyMainWin32.cpp"
 #elif defined(ARDUINO_ARCH_STM32F1)
 #include "hal/architecture/STM32F1/MyMainSTM32F1.cpp"
 #elif defined(TEENSYDUINO)

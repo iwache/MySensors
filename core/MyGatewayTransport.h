@@ -79,7 +79,11 @@
 #define MSG_GW_STARTUP_COMPLETE "Gateway startup complete."		//!< Gateway startup message
 
 #if defined(MY_DEBUG_VERBOSE_GATEWAY)
+#if defined(WIN32)
+#define GATEWAY_DEBUG(x,...)	DEBUG_OUTPUT(x, __VA_ARGS__)	//!< debug output
+#else
 #define GATEWAY_DEBUG(x,...)	DEBUG_OUTPUT(x, ##__VA_ARGS__)	//!< debug output
+#endif
 #else
 #define GATEWAY_DEBUG(x,...)									//!< debug NULL
 #endif

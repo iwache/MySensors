@@ -21,7 +21,11 @@
 
 // debug
 #if defined(MY_DEBUG_VERBOSE_TRANSPORT)
+#if defined(WIN32)
+#define TRANSPORT_DEBUG(x,...) DEBUG_OUTPUT(x, __VA_ARGS__)	//!< debug
+#else
 #define TRANSPORT_DEBUG(x,...) DEBUG_OUTPUT(x, ##__VA_ARGS__)	//!< debug
+#endif
 extern char _convBuf[MAX_PAYLOAD * 2 + 1];
 #else
 #define TRANSPORT_DEBUG(x,...)	//!< debug NULL
@@ -842,9 +846,14 @@ void transportProcessMessage(void)
 		(void)gatewayTransportSend(_msg);
 #endif
 		// Call incoming message callback if available
+#if defined(WIN32)
+		// Visual C++ has no weak function support
+		receive(_msg);
+#else
 		if (receive) {
 			receive(_msg);
 		}
+#endif
 	} else if (destination == BROADCAST_ADDRESS) {
 		TRANSPORT_DEBUG(PSTR("TSF:MSG:BC\n"));	// broadcast msg
 		if (command == C_INTERNAL) {
@@ -908,9 +917,14 @@ void transportProcessMessage(void)
 			// Hand over message to controller
 			(void)gatewayTransportSend(_msg);
 #endif
+#if defined(WIN32)
+			// Visual C++ has no weak function support
+			receive(_msg);
+#else
 			if (receive) {
 				receive(_msg);
 			}
+#endif
 		}
 
 	} else {
@@ -1081,7 +1095,7 @@ void transportReportRoutingTable(void)
 {
 #if defined(MY_REPEATER_FEATURE)
 	for (uint16_t cnt = 0; cnt < SIZE_ROUTES; cnt++) {
-		const uint8_t route = transportGetRoute(cnt);
+		const uint8_t route = transportGetRoute((uint8_t)cnt);
 		if (route != BROADCAST_ADDRESS) {
 			TRANSPORT_DEBUG(PSTR("TSF:RRT:ROUTE N=%" PRIu8 ",R=%" PRIu8 "\n"), cnt, route);
 			uint8_t outBuf[2] = { (uint8_t)cnt,route };

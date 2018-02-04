@@ -107,6 +107,11 @@ char* MyMessage::getStream(char *buffer) const
 	}
 }
 
+#if defined(WIN32)
+// suppress warning in Visual C++
+#pragma warning(push)
+#pragma warning(disable: 4996)
+#endif
 char* MyMessage::getString(char *buffer) const
 {
 	uint8_t payloadType = miGetPayloadType();
@@ -134,10 +139,13 @@ char* MyMessage::getString(char *buffer) const
 		return NULL;
 	}
 }
+#if defined(WIN32)
+#pragma warning(pop)
+#endif
 
 bool MyMessage::getBool() const
 {
-	return getByte();
+	return getByte() != 0;
 }
 
 uint8_t MyMessage::getByte() const
@@ -157,7 +165,7 @@ float MyMessage::getFloat() const
 	if (miGetPayloadType() == P_FLOAT32) {
 		return fValue;
 	} else if (miGetPayloadType() == P_STRING) {
-		return atof(data);
+		return (float)(atof(data));
 	} else {
 		return 0;
 	}
@@ -238,7 +246,7 @@ MyMessage& MyMessage::set(void* value, uint8_t length)
 
 MyMessage& MyMessage::set(const char* value)
 {
-	uint8_t length = value == NULL ? 0 : min(strlen(value), (size_t)MAX_PAYLOAD);
+	uint8_t length = value == NULL ? 0 : (uint8_t)(min(strlen(value), (size_t)MAX_PAYLOAD));
 	miSetLength(length);
 	miSetPayloadType(P_STRING);
 	if (length) {
@@ -249,7 +257,7 @@ MyMessage& MyMessage::set(const char* value)
 	return *this;
 }
 
-#if !defined(__linux__)
+#if !defined(__linux__) && !defined(WIN32)
 MyMessage& MyMessage::set(const __FlashStringHelper* value)
 {
 	uint8_t length = value == NULL ? 0

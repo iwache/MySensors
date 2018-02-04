@@ -22,11 +22,17 @@
 #if defined(__linux__)
 #include <stdlib.h>
 #include <unistd.h>
+#elif defined(WIN32)
+#include <stdlib.h>
 #endif
 
 // debug output
 #if defined(MY_DEBUG_VERBOSE_CORE)
+#if defined(WIN32)
+#define CORE_DEBUG(x,...)	DEBUG_OUTPUT(x, __VA_ARGS__)	//!< debug
+#else
 #define CORE_DEBUG(x,...)	DEBUG_OUTPUT(x, ##__VA_ARGS__)	//!< debug
+#endif
 #else
 #define CORE_DEBUG(x,...)									//!< debug NULL
 #endif
@@ -74,13 +80,18 @@ void _process(void)
 	// To avoid high cpu usage
 	usleep(10000); // 10ms
 #endif
+
+#if defined(WIN32)
+	// To avoid high cpu usage
+	delay(10); // 10ms
+#endif
 }
 
 void _infiniteLoop(void)
 {
 	while(1) {
 		doYield();
-#if defined(__linux__)
+#if defined(__linux__) || defined(WIN32)
 		exit(1);
 #endif
 	}
@@ -91,9 +102,14 @@ void _begin(void)
 	// reset wdt
 	hwWatchdogReset();
 
+#if defined(WIN32)
+	// Visual C++ has no weak function support
+	preHwInit();
+#else
 	if (preHwInit) {
 		preHwInit();
 	}
+#endif
 
 	const bool hwInitResult = hwInit();
 
@@ -114,10 +130,16 @@ void _begin(void)
 	_coreConfig.presentationSent = false;
 
 	// Call sketch before() (if defined)
+#if defined(WIN32)
+	// Visual C++ has no weak function support
+	CORE_DEBUG(PSTR("MCO:BGN:BFR\n"));	// before callback
+	before();
+#else
 	if (before) {
 		CORE_DEBUG(PSTR("MCO:BGN:BFR\n"));	// before callback
 		before();
 	}
+#endif
 
 #if defined(MY_DEFAULT_TX_LED_PIN) || defined(MY_DEFAULT_RX_LED_PIN) || defined(MY_DEFAULT_ERR_LED_PIN)
 	ledsInit();
@@ -163,10 +185,16 @@ void _begin(void)
 #endif
 
 	// Call sketch setup() (if defined)
+#if defined(WIN32)
+	// Visual C++ has no weak function support
+	CORE_DEBUG(PSTR("MCO:BGN:STP\n"));	// setup callback
+	setup();
+#else
 	if (setup) {
 		CORE_DEBUG(PSTR("MCO:BGN:STP\n"));	// setup callback
 		setup();
 	}
+#endif
 #if defined(MY_SENSOR_NETWORK)
 	CORE_DEBUG(PSTR("MCO:BGN:INIT OK,TSP=%" PRIu8 "\n"), isTransportReady());
 #else
@@ -234,9 +262,14 @@ void presentNode(void)
 
 #endif
 
+#if defined(WIN32)
+	// Visual C++ has no weak function support
+	presentation();
+#else
 	if (presentation) {
 		presentation();
 	}
+#endif
 }
 
 
@@ -363,7 +396,7 @@ bool sendSketchInfo(const char *name, const char *version, const bool ack)
 	return result;
 }
 
-#if !defined(__linux__)
+#if !defined(__linux__) && !defined(WIN32)
 bool sendSketchInfo(const __FlashStringHelper *name, const __FlashStringHelper *version,
                     const bool ack)
 {
@@ -421,9 +454,15 @@ bool _processInternalMessages(void)
 			(void)sendHeartbeat();
 		} else if (type == I_TIME) {
 			// Deliver time to callback
+#if defined(WIN32)
+			// Visual C++ has no weak function support
+			receiveTime(_msg.getULong());
+#else
 			if (receiveTime) {
 				receiveTime(_msg.getULong());
 			}
+#endif
+
 		}  else if (type == I_CHILDREN) {
 			if (_msg.data[0] == 'C') {
 #if defined(MY_REPEATER_FEATURE) && defined(MY_SENSOR_NETWORK)

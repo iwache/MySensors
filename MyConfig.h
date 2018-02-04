@@ -247,6 +247,39 @@
 //#define MY_RS485_HWSERIAL (Serial1)
 /** @}*/ // End of RS485SettingGrpPub group
 
+
+/**
+ * @defgroup EtherSettingGrpPub ETHER
+ * @ingroup RadioSettingGrpPub
+ * @brief These options are specific to the ETHER ethernet via TCP transport.
+ * @{
+ */
+
+/**
+ * @def MY_ETHER
+ * @brief Define this to use the ETHER ethernet transport for sensor network communication.
+ */
+//#define MY_ETHER
+
+// MY_ETHER server information
+
+/**
+ * @def MY_ETHER_SERVER
+ * @brief The ETHER ethernet server name or server IP.
+ */
+#ifndef MY_ETHER_SERVER
+#define MY_ETHER_SERVER "localhost"
+#endif
+
+/**
+* @def MY_ETHER_SERVER_PORT
+* @brief The ETHER ethernet server IP port.
+*/
+#ifndef MY_ETHER_SERVER_PORT
+#define MY_ETHER_SERVER_PORT (5445)
+#endif
+/** @}*/ // End of EtherSettingGrpPub group
+
 /**
  * @defgroup RF24SettingGrpPub RF24
  * @ingroup RadioSettingGrpPub
@@ -1340,12 +1373,15 @@
  * @brief Define this for Ethernet GW based on the ESP8266.
  * @def MY_GATEWAY_LINUX
  * @brief Define this for Ethernet GW based on Linux.
+ * @def MY_GATEWAY_WIN32
+ * @brief Define this for Ethernet GW based on Windows.
  */
 // The gateway options available
 //#define MY_GATEWAY_W5100
 //#define MY_GATEWAY_ENC28J60
 //#define MY_GATEWAY_ESP8266
 //#define MY_GATEWAY_LINUX
+//#define MY_GATEWAY_WIN32
 
 
 /**
@@ -1770,6 +1806,24 @@
 #define MY_LINUX_CONFIG_FILE "/etc/mysensors.dat"
 #endif
 /** @}*/ // End of LinuxSettingGrpPub group
+
+/**
+ * @defgroup Win32SettingGrpPub Win32
+ * @ingroup PlatformSettingGrpPub
+ * @brief These options control Win32 specific configurations.
+ * @{
+ */
+
+/**
+ * @def MY_WIN32_CONFIG_FILE
+ * @brief Sets the filepath for the gateway config file.
+ *
+ * @note For now the configuration file is only used to store the emulated eeprom state.
+ */
+#ifndef MY_WIN32_CONFIG_FILE
+#define MY_WIN32_CONFIG_FILE "mysensors-eeprom.dat"
+#endif
+/** @}*/ // End of Win32SettingGrpPub group
 /** @}*/ // End of PlatformSettingGrpPub group
 
 /*
@@ -1782,7 +1836,7 @@
  * MY_IS_GATEWAY is true when @ref MY_GATEWAY_FEATURE is set.
  * MY_NODE_TYPE contain a string describing the class of sketch/node (gateway/repeater/node).
  */
-#if defined(MY_GATEWAY_SERIAL) || defined(MY_GATEWAY_W5100) || defined(MY_GATEWAY_ENC28J60) || defined(MY_GATEWAY_ESP8266) || defined(MY_GATEWAY_LINUX) || defined(MY_GATEWAY_MQTT_CLIENT)
+#if defined(MY_GATEWAY_SERIAL) || defined(MY_GATEWAY_W5100) || defined(MY_GATEWAY_ENC28J60) || defined(MY_GATEWAY_ESP8266) || defined(MY_GATEWAY_LINUX) || defined(MY_GATEWAY_WIN32) || defined(MY_GATEWAY_MQTT_CLIENT)
 #define MY_GATEWAY_FEATURE
 #define MY_IS_GATEWAY (true)
 #define MY_NODE_TYPE "GW"
@@ -1812,15 +1866,27 @@
 #if defined(MY_DEBUG) || defined(MY_DEBUG_VERBOSE_CORE) || defined(MY_DEBUG_VERBOSE_TRANSPORT) || defined(MY_DEBUG_VERBOSE_GATEWAY) || defined(MY_DEBUG_VERBOSE_SIGNING) || defined(MY_DEBUG_VERBOSE_OTA_UPDATE) || defined(MY_DEBUG_VERBOSE_RF24) || defined(MY_DEBUG_VERBOSE_NRF5_ESB) || defined(MY_DEBUG_VERBOSE_RFM69) || defined(MY_DEBUG_VERBOSE_RFM95)
 #define DEBUG_OUTPUT_ENABLED	//!< DEBUG_OUTPUT_ENABLED
 #ifndef MY_DEBUG_OTA
+#if defined(WIN32)
+#define DEBUG_OUTPUT(x,...)		hwDebugPrint(x, __VA_ARGS__)	//!< debug
+#else
 #define DEBUG_OUTPUT(x,...)		hwDebugPrint(x, ##__VA_ARGS__)	//!< debug
+#endif
 #else
 #ifndef MY_OTA_LOG_SENDER_FEATURE
 #define MY_OTA_LOG_SENDER_FEATURE
 #endif
 #ifndef MY_DEBUG_OTA_DISABLE_ACK
+#if defined(WIN32)
+#define DEBUG_OUTPUT(x,...)		OTALog((MY_DEBUG_OTA), true, x, __VA_ARGS__)	//!< debug
+#else
 #define DEBUG_OUTPUT(x,...)		OTALog((MY_DEBUG_OTA), true, x, ##__VA_ARGS__)	//!< debug
+#endif
+#else
+#if defined(WIN32)
+#define DEBUG_OUTPUT(x,...)		OTALog((MY_DEBUG_OTA), false, x, __VA_ARGS__)	//!< debug
 #else
 #define DEBUG_OUTPUT(x,...)		OTALog((MY_DEBUG_OTA), false, x, ##__VA_ARGS__)	//!< debug
+#endif
 #endif
 // disable radio related debugging messages
 #undef MY_DEBUG_VERBOSE_RF24
@@ -1841,7 +1907,7 @@
 #endif
 
 // Enable sensor network "feature" if one of the transport types was enabled
-#if defined(MY_RADIO_RF24) || defined(MY_RADIO_NRF5_ESB) || defined(MY_RADIO_RFM69) || defined(MY_RADIO_RFM95) || defined(MY_RS485)
+#if defined(MY_RADIO_RF24) || defined(MY_RADIO_NRF5_ESB) || defined(MY_RADIO_RFM69) || defined(MY_RADIO_RFM95) || defined(MY_RS485) || defined(MY_ETHER)
 #define MY_SENSOR_NETWORK
 #endif
 
@@ -1941,6 +2007,7 @@
 #define MY_GATEWAY_ENC28J60
 #define MY_GATEWAY_ESP8266
 #define MY_GATEWAY_LINUX
+#define MY_GATEWAY_WIN32
 #define MY_IP_ADDRESS 192,168,178,66
 #define MY_USE_UDP
 #define MY_CONTROLLER_IP_ADDRESS 192,168,178,254
@@ -1964,6 +2031,10 @@
 // RS485
 #define MY_RS485
 #define MY_RS485_HWSERIAL (Serial1)
+// ETHER
+#define MY_ETHER
+#define MY_ETHER_SERVER "localhost"
+#define MY_ETHER_SERVER_PORT (5445)
 // RF24
 #define MY_RADIO_RF24
 #define MY_DEBUG_VERBOSE_RF24

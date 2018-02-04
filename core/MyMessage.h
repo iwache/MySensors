@@ -277,6 +277,9 @@ typedef enum {
 
 #if !DOXYGEN
 #ifdef __cplusplus
+#if defined(WIN32)
+#pragma pack(push,1)
+#endif
 class MyMessage
 {
 private:
@@ -326,7 +329,7 @@ public:
 	// Setters for payload
 	MyMessage& set(void* payload, uint8_t length);
 	MyMessage& set(const char* value);
-#if !defined(__linux__)
+#if !defined(__linux__) && !defined(WIN32)
 	MyMessage& set(const __FlashStringHelper* value);
 #endif
 	MyMessage& set(float value, uint8_t decimals);
@@ -360,6 +363,9 @@ typedef union {
 	// Each message can transfer a payload. We add one extra byte for string
 	// terminator \0 to be "printable" this is not transferred OTA
 	// This union is used to simplify the construction of the binary data types transferred.
+#if defined(WIN32)
+#pragma pack(push,1)
+#endif
 	union {
 		uint8_t bValue;
 		uint16_t uiValue;
@@ -375,9 +381,19 @@ typedef union {
 			uint8_t sensorType;   // Sensor type hint for controller, see table above
 		};
 		char data[MAX_PAYLOAD + 1];
+#if defined(WIN32)
+	};
+#pragma pack(pop)
+#else
 	} __attribute__((packed));
+#endif
 #ifdef __cplusplus
+#if defined(WIN32)
+};
+#pragma pack(pop)
+#else
 } __attribute__((packed));
+#endif
 #else
 };
 uint8_t array[HEADER_SIZE + MAX_PAYLOAD + 1];

@@ -36,10 +36,17 @@ bool protocolParse(MyMessage &message, char *inputString)
 	uint8_t command = 0;
 
 	// Extract command data coming on serial line
+#if defined(WIN32)
+	// Visual C++ has no strtok_r() but only strtok_s() function
+	for (str = strtok_s(inputString, ";", &p); // split using semicolon
+		str && i < 6; // loop while str is not null an max 5 times
+		str = strtok_s(NULL, ";", &p) // get subsequent tokens
+#else
 	for (str = strtok_r(inputString, ";", &p); // split using semicolon
 	        str && i < 6; // loop while str is not null an max 5 times
 	        str = strtok_r(NULL, ";", &p) // get subsequent tokens
-	    ) {
+#endif
+		) {
 		switch (i) {
 		case 0: // Radio id (destination)
 			message.destination = atoi(str);
@@ -69,7 +76,7 @@ bool protocolParse(MyMessage &message, char *inputString)
 			} else {
 				value = str;
 				// Remove trailing carriage return and newline character (if it exists)
-				uint8_t lastCharacter = strlen(value)-1;
+				uint8_t lastCharacter = (uint8_t)strlen(value) - 1;
 				if (value[lastCharacter] == '\r') {
 					value[lastCharacter] = 0;
 				}

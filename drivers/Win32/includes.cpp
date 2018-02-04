@@ -1,7 +1,7 @@
 // Unknown macro for the Visual C++ compiler
 #define __attribute__(x)
 
-// Additional includes for the stupid Visual C++ compiler
+// Additional includes for the Visual C++ compiler
 #include "drivers/Win32/compatibility.cpp"
 #include "drivers/Win32/noniso.cpp"
 #include "drivers/Win32/log.c"
