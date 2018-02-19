@@ -572,7 +572,7 @@
 
 /**
  * @def MY_RADIO_RFM69
- * @brief Define this to use RFM69 based radios for sensor network communication.
+ * @brief Define this to use %RFM69 based radios for sensor network communication.
  */
 //#define MY_RADIO_RFM69
 
@@ -641,7 +641,7 @@
 
 /**
  * @def MY_RFM69_ATC_TARGET_RSSI_DBM
- * @brief Target RSSI level (in dBm) for RFM69 ATC mode.
+ * @brief Target RSSI level (in dBm) for %RFM69 ATC mode.
  */
 #ifndef MY_RFM69_ATC_TARGET_RSSI_DBM
 #define MY_RFM69_ATC_TARGET_RSSI_DBM (-80)
@@ -649,7 +649,7 @@
 
 /**
  * @def MY_RFM69_ATC_MODE_DISABLED
- * @brief Define to disable ATC mode of RFM69 driver.
+ * @brief Define to disable ATC mode of %RFM69 driver.
  */
 //#define MY_RFM69_ATC_MODE_DISABLED
 
@@ -668,7 +668,7 @@
 
 /**
  * @def MY_RFM69_NETWORKID
- * @brief RFM69 Network ID. Use the same for all nodes that will talk to each other.
+ * @brief %RFM69 Network ID. Use the same for all nodes that will talk to each other.
  */
 #ifndef MY_RFM69_NETWORKID
 #define MY_RFM69_NETWORKID (100)
@@ -682,6 +682,7 @@
 
 #ifdef MY_RF69_RESET
 // legacy, older board files
+// not enabled now: #warning MY_RF69_RESET is depreciated, please use MY_RFM69_RST_PIN instead.
 #define MY_RFM69_RST_PIN MY_RF69_RESET
 #endif
 
@@ -693,11 +694,12 @@
 
 /**
  * @def MY_RFM69_IRQ_PIN
- * @brief Define this to use the %RFM69 IRQ pin (optional).
+ * @brief Define this to override the default %RFM69 IRQ pin assignment.
  */
 #ifndef MY_RFM69_IRQ_PIN
 #ifdef MY_RF69_IRQ_PIN
 // legacy, older board files
+// not enabled now: #warning MY_RF69_IRQ_PIN is depreciated, please use MY_RFM69_IRQ_PIN instead.
 #define MY_RFM69_IRQ_PIN MY_RF69_IRQ_PIN
 #else
 #define MY_RFM69_IRQ_PIN DEFAULT_RFM69_IRQ_PIN
@@ -711,19 +713,21 @@
 #ifndef MY_RFM69_IRQ_NUM
 #ifdef MY_RF69_IRQ_NUM
 // legacy, older board files
+// not enabled now: #warning MY_RF69_IRQ_NUM is depreciated, please use MY_RFM69_IRQ_NUM instead.
 #define MY_RFM69_IRQ_NUM MY_RF69_IRQ_NUM
 #else
-#define MY_RFM69_IRQ_NUM DEFAULT_RFM69_IRQ_NUM
+#define MY_RFM69_IRQ_NUM digitalPinToInterrupt(MY_RFM69_IRQ_PIN)
 #endif
 #endif
 
 /**
  * @def MY_RFM69_CS_PIN
- * @brief RFM69 SPI chip select pin.
+ * @brief %RFM69 SPI chip select pin.
  */
 #ifndef MY_RFM69_CS_PIN
 #ifdef MY_RF69_SPI_CS
 // legacy, older board files
+// not enabled now: #warning MY_RF69_SPI_CS is depreciated, please use MY_RFM69_CS_PIN instead.
 #define MY_RFM69_CS_PIN MY_RF69_SPI_CS
 #else
 #define MY_RFM69_CS_PIN DEFAULT_RFM69_CS_PIN
@@ -764,29 +768,29 @@
 #define  MY_RFM69_DEFAULT_LISTEN_IDLE_US (1*1000000ul)
 #endif
 
-#if !defined(MY_RFM69_BITRATE_MSB) && !defined(MY_RFM69_BITRATE_LSB)
 /**
- * @def MY_RFM69_BITRATE_MSB
- * @brief %RFM69 bit rate (most significant bits)
+ * @def MY_RFM69_MODEM_CONFIGURATION
+ * @brief %RFM69 modem configuration, default is %RFM69_FSK_BR55_5_FD50
  *
- * Bitrate between the transmitter and the receiver must be better than 6.5.
- * Refer to RFM69registers_old.h (L.153) or RFM69registers_new.h (L.154) for settings or
- * http://www.semtech.com/apps/filedown/down.php?file=sx1231.pdf
- * @note RFM69_FOSC(Hz)/MSB_LSBVALUE = Bitrate in kbits
+ * | Configuration           | Modulation (xxx) | Bit rate | FD     | RXBW     | Additional settings
+ * |-------------------------|------------------|----------|--------|----------|---------------------------
+ * | RFM69_xxx_BR2_FD5       | FSK/GFSK/OOK     | 2000     | 5000   | 111_24_4 | Whitening
+ * | RFM69_xxx_BR2_4_FD4_8   | FSK/GFSK/OOK     | 2400     | 4800   | 111_24_4 | Whitening
+ * | RFM69_xxx_BR4_8_FD9_6   | FSK/GFSK/OOK     | 4800     | 9600   | 111_24_4 | Whitening
+ * | RFM69_xxx_BR9_6_FD19_2  | FSK/GFSK/OOK     | 9600     | 19200  | 111_24_4 | Whitening
+ * | RFM69_xxx_BR19_2_FD38_4 | FSK/GFSK/OOK     | 19200    | 38400  | 111_24_3 | Whitening
+ * | RFM69_xxx_BR38_4_FD76_8 | FSK/GFSK/OOK     | 38400    | 76800  | 111_24_2 | Whitening
+ * | RFM69_xxx_BR55_5_FD50   | FSK/GFSK/OOK     | 55555    | 50000  | 111_16_2 | Whitening
+ * | RFM69_xxx_BR57_6_FD120  | FSK/GFSK/OOK     | 57600    | 120000 | 111_16_1 | Whitening
+ * | RFM69_xxx_BR125_FD125   | FSK/GFSK/OOK     | 125000   | 125000 | 010_16_2 | Whitening
+ * | RFM69_xxx_BR250_FD250   | FSK/GFSK/OOK     | 250000   | 250000 | 111_16_0 | Whitening
+ *
+ * https://www.semtech.com/uploads/documents/sx1231.pdf
  *
  */
-#define MY_RFM69_BITRATE_MSB (RFM69_BITRATEMSB_55555)
-/**
- * @def MY_RFM69_BITRATE_LSB
- * @brief %RFM69 bit rate (least significant bits)
- *
- * Bitrate between the transmitter and the receiver must be better than 6.5.
- * Refer to RFM69registers_old.h (L.153) or RFM69registers_new.h (L.154) for settings or
- * http://www.semtech.com/apps/filedown/down.php?file=sx1231.pdf
- * @note RFM69_FOSC(Hz)/MSB_LSBVALUE = Bitrate in kbits
- */
-#define MY_RFM69_BITRATE_LSB (RFM69_BITRATELSB_55555)
-#endif
+//#define MY_RFM69_MODEM_CONFIGURATION (RFM69_FSK_BR55_5_FD50)
+
+
 /** @}*/ // End of RFM69SettingGrpPub group
 
 /**
@@ -863,7 +867,7 @@
 
 /**
  * @def MY_RFM95_IRQ_PIN
- * @brief Define this to use the RFM95 IRQ pin (optional).
+ * @brief Define this to use the RFM95 IRQ pin.
  */
 #ifndef MY_RFM95_IRQ_PIN
 #define MY_RFM95_IRQ_PIN DEFAULT_RFM95_IRQ_PIN
@@ -874,7 +878,7 @@
  * @brief RFM95 IRQ number.
  */
 #ifndef MY_RFM95_IRQ_NUM
-#define MY_RFM95_IRQ_NUM DEFAULT_RFM95_IRQ_NUM
+#define MY_RFM95_IRQ_NUM digitalPinToInterrupt(MY_RFM95_IRQ_PIN)
 #endif
 
 /**
@@ -914,7 +918,7 @@
  * @brief Target RSSI level (in dBm) for RFM95 ATC mode
  */
 #ifndef MY_RFM95_ATC_TARGET_RSSI
-#define MY_RFM95_ATC_TARGET_RSSI (-60)
+#define MY_RFM95_ATC_TARGET_RSSI (-70)
 #endif
 
 /**
@@ -1283,6 +1287,15 @@
 #endif
 
 /**
+ * @def MY_INCLUSION_LED_PIN
+ * @brief Enables an inclusion mode LED indicator on the gateway device.
+ *
+ * With this defined, inclusion mode status (on or off) is indicated by the LED.
+ * This feature obeys @ref MY_WITH_LEDS_BLINKING_INVERSE
+ */
+//#define MY_INCLUSION_LED_PIN (7)
+
+/**
  * @def MY_INCLUSION_MODE_BUTTON_PIN
  * @brief The default input pin used for the inclusion mode button.
  */
@@ -1470,12 +1483,44 @@
  * @ingroup MyConfigGrp
  * @brief These options control security related configurations.
  *
- * Note that some encryption configurations are on a per-radio basis as these are specific to each
- * radio.
+ * Overview over all security related settings and how/where to apply them:
+ * | Setting                  | Description | Arduino | Raspberry PI @c configure argument
+ * |--------------------------|-------------|---------|-------------
+ * | @ref MY_SECURITY_SIMPLE_PASSWD | Enables security (signing and encryption) without the need for @ref personalization | "#define" in the top of your sketch | Not supported (use the other two "simple" options)
+ * | @ref MY_SIGNING_SIMPLE_PASSWD | Enables signing without the need for @ref personalization | "#define" in the top of your sketch | @verbatim --my-signing=password --my-security-password=<PASSWORD> @endverbatim
+ * | @ref MY_ENCRYPTION_SIMPLE_PASSWD | Enables encryption without the need for @ref personalization | "#define" in the top of your sketch | @verbatim --my-security-password=<PASSWORD> @endverbatim and encryption enabled on the chosen transport
+ * | @ref MY_DEBUG_VERBOSE_SIGNING | Enables verbose signing debugging | "#define" in the top of your sketch | @verbatim --my-signing-debug @endverbatim
+ * | @ref MY_SIGNING_ATSHA204 | Enables support to sign messages backed by ATSHA204A hardware | "#define" in the top of your sketch | Not supported
+ * | @ref MY_SIGNING_SOFT | Enables support to sign messages backed by software | "#define" in the top of your sketch | @verbatim --my-signing=software @endverbatim
+ * | @ref MY_SIGNING_REQUEST_SIGNATURES | Enables node/gw to require signed messages | "#define" in the top of your sketch | @verbatim --my-signing-request-signatures @endverbatim
+ * | @ref MY_SIGNING_WEAK_SECURITY | Weakens signing security, useful for testing before deploying signing "globally" | "#define" in the top of your sketch | @verbatim --my-signing-weak_security @endverbatim
+ * | @ref MY_VERIFICATION_TIMEOUT_MS | Change default signing timeout | "#define" in the top of your sketch | @verbatim --my-signing-verification-timeout-ms=<TIMEOUT> @endverbatim
+ * | @ref MY_SIGNING_NODE_WHITELISTING | Defines a whitelist of trusted nodes | "#define" in the top of your sketch | @verbatim --my-signing-whitelist="<WHITELIST>" @endverbatim
+ * | @ref MY_SIGNING_ATSHA204_PIN | Change default ATSHA204A communication pin | "#define" in the top of your sketch | Not supported
+ * | @ref MY_SIGNING_SOFT_RANDOMSEED_PIN | Change default software RNG seed pin | "#define" in the top of your sketch | Not supported
+ * | @ref MY_RF24_ENABLE_ENCRYPTION | Enables encryption on RF24 radios | "#define" in the top of your sketch | @verbatim --my-rf24-encryption-enabled @endverbatim
+ * | @ref MY_RFM69_ENABLE_ENCRYPTION | Enables encryption on %RFM69 radios | "#define" in the top of your sketch | @verbatim --my-rfm69-encryption-enabled @endverbatim
+ * | @ref MY_NRF5_ESB_ENABLE_ENCRYPTION | Enables encryption on nRF5 radios | "#define" in the top of your sketch | Not supported
+ * | @ref MY_NODE_LOCK_FEATURE | Enables the node locking feature | "#define" in the top of your sketch | Not supported
+ * | @ref MY_NODE_UNLOCK_PIN | Change default unlock pin | "#define" in the top of your sketch | Not supported
+ * | @ref MY_NODE_LOCK_COUNTER_MAX | Change default "malicious activity" counter max value | "#define" in the top of your sketch | Not supported
  *
- * @see MY_RF24_ENABLE_ENCRYPTION, MY_RFM69_ENABLE_ENCRYPTION, MY_NRF5_ESB_ENABLE_ENCRYPTION
  * @{
  */
+/**
+ * @def MY_SECURITY_SIMPLE_PASSWD
+ * @brief Enables SW backed signing functionality and encryption functionality in library and uses
+ *        provided password as key.
+ *
+ * For details on the effects, see the references.
+ * @see MY_SIGNING_SIMPLE_PASSWD, MY_ENCRYPTION_SIMPLE_PASSWD
+ */
+//#define MY_SECURITY_SIMPLE_PASSWD "MyInsecurePassword"
+#if defined(MY_SECURITY_SIMPLE_PASSWD)
+#define MY_SIGNING_SIMPLE_PASSWD MY_SECURITY_SIMPLE_PASSWD
+#define MY_ENCRYPTION_SIMPLE_PASSWD MY_SECURITY_SIMPLE_PASSWD
+#endif
+
 /**
  * @defgroup SigningSettingGrpPub Signing
  * @ingroup SecuritySettingGrpPub
@@ -1494,8 +1539,10 @@
  * @def MY_SIGNING_SIMPLE_PASSWD
  * @brief Enables SW backed signing functionality in library and uses provided password as key.
  *
- * This flag will enable signing, signature requests and encryption. It has to be identical on ALL
- * nodes in the network.
+ * This flag is automatically set if @ref MY_SECURITY_SIMPLE_PASSWD is used.
+ *
+ * This flag will enable signing and signature requests. It has to be identical on ALL nodes in the
+ * network.
  *
  * Whitelisting is supported and serial will be the first 8 characters of the password, the ninth
  * character will be the node ID (to make each node have a unique serial).
@@ -1503,22 +1550,22 @@
  * As with the regular signing modes, whitelisting is only activated if a whitelist is specified in
  * the sketch.
  *
- * No personalization is required for this mode.
+ * No @ref personalization is required for this mode.
  *
  * It is allowed to set @ref MY_SIGNING_WEAK_SECURITY for deployment purposes in this mode as it is
  * with the regular software and ATSHA204A based modes.
  *
- * If the provided password is shorter than the size of the HMAC or %AES key, it will be null-padded
+ * If the provided password is shorter than the size of the HMAC key, it will be null-padded
  * to accommodate the key size in question. A 32 character password is the maximum length. Any
  * password longer than that will be truncated.
+ *
+ * @see MY_SECURITY_SIMPLE_PASSWD
+ *
  */
 //#define MY_SIGNING_SIMPLE_PASSWD "MyInsecurePassword"
 #if defined(MY_SIGNING_SIMPLE_PASSWD)
 #define MY_SIGNING_SOFT
 #define MY_SIGNING_REQUEST_SIGNATURES
-#define MY_RF24_ENABLE_ENCRYPTION
-#define MY_RFM69_ENABLE_ENCRYPTION
-#define MY_NRF5_ESB_ENABLE_ENCRYPTION
 #endif
 
 /**
@@ -1618,6 +1665,47 @@
 #if defined(MY_SIGNING_ATSHA204) || defined(MY_SIGNING_SOFT)
 #define MY_SIGNING_FEATURE
 #endif
+/** @}*/ // End of SigningSettingGrpPub group
+
+/**
+ * @defgroup EncryptionSettingGrpPub Encryption
+ * @ingroup SecuritySettingGrpPub
+ * @brief These options control encryption related configurations.
+ *
+ * Note that encryption is toggled on a per-radio basis.
+ * @see MY_RF24_ENABLE_ENCRYPTION, MY_RFM69_ENABLE_ENCRYPTION, MY_NRF5_ESB_ENABLE_ENCRYPTION
+ * @{
+ */
+
+/**
+ * @def MY_ENCRYPTION_SIMPLE_PASSWD
+ * @brief Enables encryption on all radio transports that supports it and uses provided password as key.
+ *
+ * This flag is automatically set if @ref MY_SECURITY_SIMPLE_PASSWD is used.
+ *
+ * This flag will enable encryption. It has to be identical on ALL nodes in the network.
+ *
+ * No @ref personalization is required for this mode.
+ *
+ * If the provided password is shorter than the size of the %AES key, it will be null-padded
+ * to accommodate the key size in question. A 16 character password is the maximum length. Any
+ * password longer than that will be truncated.
+ *
+ * @see MY_SECURITY_SIMPLE_PASSWD
+ */
+//#define MY_ENCRYPTION_SIMPLE_PASSWD "MyInsecurePassword"
+#if defined(MY_ENCRYPTION_SIMPLE_PASSWD)
+#ifndef MY_RF24_ENABLE_ENCRYPTION
+#define MY_RF24_ENABLE_ENCRYPTION
+#endif
+#ifndef MY_RFM69_ENABLE_ENCRYPTION
+#define MY_RFM69_ENABLE_ENCRYPTION
+#endif
+#ifndef MY_NRF5_ESB_ENABLE_ENCRYPTION
+#define MY_NRF5_ESB_ENABLE_ENCRYPTION
+#endif
+#endif
+
 /**
  * @def MY_ENCRYPTION_FEATURE
  * @ingroup internals
@@ -1626,7 +1714,7 @@
 #if defined(MY_RF24_ENABLE_ENCRYPTION) || defined(MY_RFM69_ENABLE_ENCRYPTION) || defined(MY_NRF5_ESB_ENABLE_ENCRYPTION)
 #define MY_ENCRYPTION_FEATURE
 #endif
-/** @}*/ // End of SigningSettingGrpPub group
+/** @}*/ // End of EncryptionSettingGrpPub group
 
 /**
  * @defgroup MyLockgrppub Node locking
@@ -1724,29 +1812,39 @@
  * @brief These options control Linux specific configurations.
  * @{
  */
+
 /**
  * @def MY_LINUX_SERIAL_PORT
  * @brief Serial device port
  */
-#ifndef MY_LINUX_SERIAL_PORT
-#define MY_LINUX_SERIAL_PORT "/dev/ttyACM0"
+//#define MY_LINUX_SERIAL_PORT "/dev/ttyUSB0"
+
+/**
+ * @def MY_LINUX_SERIAL_PTY
+ * @brief deprecated option
+ */
+#ifdef MY_LINUX_SERIAL_PTY
+#warning MY_LINUX_SERIAL_PTY is deprecated, please use MY_LINUX_SERIAL_PORT
+#define MY_LINUX_SERIAL_PORT MY_LINUX_SERIAL_PTY
 #endif
 
 /**
  * @def MY_LINUX_IS_SERIAL_PTY
+ * @brief deprecated option
+ */
+#ifdef MY_LINUX_IS_SERIAL_PTY
+#warning MY_LINUX_IS_SERIAL_PTY is deprecated, please use MY_LINUX_SERIAL_IS_PTY
+#define MY_LINUX_SERIAL_IS_PTY
+#endif
+
+/**
+ * @def MY_LINUX_SERIAL_IS_PTY
  * @brief Set serial as a pseudo terminal.
  *
  * Enable this if you need to connect to a controller running on the same device.
+ * You also need to define MY_LINUX_SERIAL_PORT with the symlink name for the PTY device.
  */
-//#define MY_LINUX_IS_SERIAL_PTY
-
-/**
- * @def MY_LINUX_SERIAL_PTY
- * @brief Symlink name for the PTY device.
- */
-#ifndef MY_LINUX_SERIAL_PTY
-#define MY_LINUX_SERIAL_PTY "/dev/ttyMySensorsGateway"
-#endif
+//#define MY_LINUX_SERIAL_IS_PTY
 
 /**
  * @def MY_LINUX_SERIAL_GROUPNAME
@@ -1902,7 +2000,10 @@
 #define MY_DISABLED_SERIAL
 #define MY_SPLASH_SCREEN_DISABLED
 // linux
+#define MY_LINUX_SERIAL_PORT
+#define MY_LINUX_SERIAL_IS_PTY
 #define MY_LINUX_SERIAL_GROUPNAME
+#define MY_LINUX_SERIAL_PTY
 #define MY_LINUX_IS_SERIAL_PTY
 // inclusion mode
 #define MY_INCLUSION_MODE_FEATURE
@@ -1930,6 +2031,7 @@
 // GW
 #define MY_DEBUG_VERBOSE_GATEWAY
 #define MY_INCLUSION_BUTTON_EXTERNAL_PULLUP
+#define MY_INCLUSION_LED_PIN
 #define MY_GATEWAY_W5100
 #define MY_GATEWAY_ENC28J60
 #define MY_GATEWAY_ESP8266
@@ -1943,7 +2045,9 @@
 #define MY_DEFAULT_TX_LED_PIN
 #define MY_DEFAULT_RX_LED_PIN
 // signing
+#define MY_SECURITY_SIMPLE_PASSWD "MyInsecurePassword"
 #define MY_SIGNING_SIMPLE_PASSWD "MyInsecurePassword"
+#define MY_ENCRYPTION_SIMPLE_PASSWD "MyInsecurePassword"
 #define MY_SIGNING_ATSHA204
 #define MY_SIGNING_SOFT
 #define MY_SIGNING_REQUEST_SIGNATURES
@@ -1977,6 +2081,7 @@
 #define MY_IS_RFM69HW
 #define MY_RFM69_NEW_DRIVER
 #define MY_RFM69_POWER_PIN
+#define MY_RFM69_MODEM_CONFIGURATION
 #define MY_RFM69_ENABLE_ENCRYPTION
 #define MY_RFM69_ATC_MODE_DISABLED
 #define MY_RFM69_MAX_POWER_LEVEL_DBM
