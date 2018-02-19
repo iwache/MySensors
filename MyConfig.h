@@ -1202,6 +1202,17 @@
  *        Incompatible libraries are unable to send sensor data.
  */
 #define MY_CORE_COMPATIBILITY_CHECK
+
+ /**
+ * @def MY_PROCESS_SYNCHRONIZATION
+ * @brief This applies only to MyVirtualSensor WIN32 applications.
+ *        If defined, _coreprocess() will acquire a named mutex and stop 
+ *        all other running virtual MySensors applications until _process ends.
+ *        This is useful for debug of this application in Visual Studio 
+ *        while other MyVirtualSensor WIN32 applications are running at the same time.
+ *        When you reach a breakpoint in this app then all ather applications also will stop.
+ */
+//#define MY_PROCESS_SYNCHRONIZATION
 /** @}*/ // End of CoreSettingGrpPub group
 
 /**
@@ -1912,6 +1923,23 @@
 #ifndef MY_WIN32_CONFIG_FILE
 #define MY_WIN32_CONFIG_FILE "mysensors-eeprom.dat"
 #endif
+
+ /**
+ * @def MY_FIRMATA_CLIENT
+ * @brief Use a firmata client to connect to real hardware of a Firmata server with network connection.
+ *
+ * @note It is recommend to use ConfigurableFirmata on a WiFi connected MKR1000.
+ */
+//#define MY_FIRMATA_CLIENT
+
+#if defined(MY_FIRMATA_CLIENT)
+#if !defined(MY_FIRMATA_NETWORK_HOST)
+#define MY_FIRMATA_NETWORK_HOST "localhost"
+#endif
+#define MY_FIRMATA_NETWORK_PORT 3030
+#endif
+
+
 /** @}*/ // End of Win32SettingGrpPub group
 /** @}*/ // End of PlatformSettingGrpPub group
 

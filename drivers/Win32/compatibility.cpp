@@ -33,6 +33,10 @@
 
 #include "Arduino.h"
 
+#if defined(MY_PROCESS_SYNCHRONIZATION)
+ProcessSynchronizationWrapper processSynchronizationWrapper;
+#endif
+
 const __int64 DELTA_EPOCH_IN_MICROSECS = 11644473600000000;
 
 int gettimeofday(struct timeval *tv)
@@ -67,6 +71,9 @@ void yield(void) {}
 
 unsigned long millis(void)
 {
+#if defined(MY_PROCESS_SYNCHRONIZATION)
+	return processSynchronizationWrapper.millis();
+#else
 	timeval curTime;
 
 	if (millis_at_start == 0) {
@@ -76,8 +83,7 @@ unsigned long millis(void)
 
 	gettimeofday(&curTime);
 	return ((curTime.tv_sec - millis_at_start) * 1000) + (curTime.tv_usec / 1000);
-
-	return 0;
+#endif
 }
 
 unsigned long micros()
@@ -98,6 +104,15 @@ unsigned long micros()
 void _delay_milliseconds(unsigned int millis)
 {
 	Sleep(millis);
+}
+
+void _delay_milliseconds_and_proc_sync(unsigned int millis)
+{
+#if defined(MY_PROCESS_SYNCHRONIZATION)
+	processSynchronizationWrapper.wait(millis);
+#else
+	Sleep(millis);
+#endif
 }
 
 void _delay_microseconds(unsigned int micro)

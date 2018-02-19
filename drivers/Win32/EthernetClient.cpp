@@ -26,7 +26,6 @@
 #include <cstring>
 #include <errno.h>
 #include "log.h"
-#include "ArduinoSocketsWrapper.h"
 
 EthernetClient::EthernetClient() : _sock(-1)
 {
@@ -43,12 +42,10 @@ EthernetClient::~EthernetClient()
 
 int EthernetClient::connect(const char* host, uint16_t port)
 {
-	// ToDo: debug this with close()
-	//close();
+	close();
 
 	int result = ethernetWrapper.clientConnect(host, port, &_sock);
 	if (result != 1) {
-		_sock = -1;
 		logError("connect: %d %s - %s\n", ethernetWrapper.clientErrorCode(_sock), 
 			ethernetWrapper.clientSocketErrorCode(_sock), ethernetWrapper.clientErrorMessage(_sock));
 	}
@@ -144,11 +141,9 @@ size_t EthernetClient::write(const uint8_t *buf, size_t size)
 	if (_sock == -1) {
 		return 0;
 	}
-	//return ethernetWrapper.clientWrite(_sock, buf, size);
-
 	size_t bytes = 0;
 	while (size > 0) {
-		int rc = ethernetWrapper.clientWrite(_sock, buf + bytes, size);//send(_sock, (const char*)buf + bytes, size, 0);
+		int rc = ethernetWrapper.clientWrite(_sock, buf + bytes, size);
 		if (rc == -1) {
 			logError("send: %s\n", strerror(errno));
 			close();
@@ -210,6 +205,12 @@ void EthernetClient::flush()
 
 void EthernetClient::stop()
 {
+	if (_sock != -1) {
+		ethernetWrapper.clientClose(_sock);
+		_sock = -1;
+	}
+	return;
+
 	if (_sock == -1) {
 		return;
 	}

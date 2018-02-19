@@ -251,6 +251,8 @@ bool transportInit(void)
 		_dev.flush();
 		_dev.close();
 		_serialReset();
+
+		_nodeId = BROADCAST_ADDRESS;
 	}
 
 	if (_dev.connect(MY_ETHER_SERVER, MY_ETHER_SERVER_PORT)) {

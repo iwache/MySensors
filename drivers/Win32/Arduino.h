@@ -22,7 +22,6 @@
 
 #include <stdlib.h>
 #include <stdint.h>
-// TODO: #iwa #include <stdbool.h>
 #include <stddef.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -31,12 +30,16 @@
 #include <string>
 #include <algorithm>
 #include "stdlib_noniso.h"
+#include "ProcessSynchronizationWrapper.h"
 
 #include "GPIO.h"
-#define pinMode(pin, direction) GPIO.pinMode(pin, direction)
-#define digitalWrite(pin, value) GPIO.digitalWrite(pin, value)
-#define digitalRead(pin) GPIO.digitalRead(pin)
-#define digitalPinToInterrupt(pin) GPIO.digitalPinToInterrupt(pin)
+#define pinMode(pin, direction) GPIO._pinMode(pin, direction)
+#define digitalWrite(pin, value) GPIO._digitalWrite(pin, value)
+#define digitalRead(pin) GPIO._digitalRead(pin)
+#define digitalPinToInterrupt(pin) GPIO._digitalPinToInterrupt(pin)
+#define analogRead(pin) GPIO._analogRead(pin)
+#define analogWrite(pin, value) GPIO._analogWrite(pin, value)
+#define NOT_AN_INTERRUPT -1
 
 #include "interrupt.h"
 
@@ -67,6 +70,7 @@
 
 #define lowByte(w) ((uint8_t) ((w) & 0xff))
 #define highByte(w) ((uint8_t) ((w) >> 8))
+#define word(bh, bl) ((bh <<  8) + bl)
 
 #define bitRead(value, bit) (((value) >> (bit)) & 0x01)
 #define bitSet(value, bit) ((value) |= (1UL << (bit)))
@@ -103,5 +107,10 @@ void _delay_microseconds(unsigned int micro);
 void randomSeed(unsigned long seed);
 long randMax(long howbig);
 long randMinMax(long howsmall, long howbig);
+void _delay_milliseconds_and_proc_sync(unsigned int millis);
+
+#if defined(MY_PROCESS_SYNCHRONIZATION)
+extern ProcessSynchronizationWrapper processSynchronizationWrapper;
+#endif
 
 #endif

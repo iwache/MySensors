@@ -80,11 +80,6 @@ void _process(void)
 	// To avoid high cpu usage
 	usleep(10000); // 10ms
 #endif
-
-#if defined(WIN32)
-	// To avoid high cpu usage
-	delay(10); // 10ms
-#endif
 }
 
 void _infiniteLoop(void)
@@ -103,6 +98,12 @@ void _begin(void)
 	hwWatchdogReset();
 
 #if defined(WIN32)
+#if defined(MY_FIRMATA_CLIENT)
+	// begin firmata with Ethernet client stream
+	EthernetClient *client = new EthernetClient();
+	MyEthernetClientStream *stream = new MyEthernetClientStream(*client, MY_FIRMATA_NETWORK_HOST, MY_FIRMATA_NETWORK_PORT);
+	MyFirmata.begin(*stream);
+#endif
 	// Visual C++ has no weak function support
 	preHwInit();
 #else
@@ -566,6 +567,17 @@ bool wait(const uint32_t waitingMS, const uint8_t cmd, const uint8_t msgType)
 
 void doYield(void)
 {
+#if defined(WIN32)
+
+#if defined(MY_FIRMATA_CLIENT)
+	MyFirmata.update();
+#endif
+
+	// To avoid high cpu usage and optionally sync with other 
+	// virtual MySensor apps by defining MY_PROCESS_SYNCHRONIZATION
+	_delay_milliseconds_and_proc_sync(10);
+#endif
+
 	hwWatchdogReset();
 
 	yield();

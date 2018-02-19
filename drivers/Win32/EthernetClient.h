@@ -24,7 +24,7 @@
 
 #include "Client.h"
 #include "IPAddress.h"
-#include "ArduinoSocketsWrapper.h"
+#include "EthernetWrapper.h"
 
 // State codes from W5100 library
 #define ETHERNETCLIENT_W5100_CLOSED 0x00

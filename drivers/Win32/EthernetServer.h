@@ -28,7 +28,7 @@
 #include "IPAddress.h"
 #include "EthernetClient.h"
 
-#include "ArduinoSocketsWrapper.h"
+#include "EthernetWrapper.h"
 
 #ifdef ETHERNETSERVER_MAX_CLIENTS
 #define ETHERNETSERVER_BACKLOG ETHERNETSERVER_MAX_CLIENTS //!< Maximum length to which the queue of pending connections may grow.

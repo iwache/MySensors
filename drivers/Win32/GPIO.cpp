@@ -18,13 +18,10 @@
  */
 
 #include "GPIO.h"
-//#include <dirent.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
-//#include <unistd.h>
-#include "log.h"
 
 // Declare a single default instance
 GPIOClass GPIO = GPIOClass();
@@ -35,51 +32,63 @@ GPIOClass::GPIOClass()
 
 GPIOClass::GPIOClass(const GPIOClass& other)
 {
-	lastPinNum = other.lastPinNum;
-
-	exportedPins = new uint8_t[lastPinNum + 1];
-	for (int i = 0; i < lastPinNum + 1; ++i) {
-		exportedPins[i] = other.exportedPins[i];
-	}
 }
 
 GPIOClass::~GPIOClass()
 {
-	delete [] exportedPins;
 }
 
-void GPIOClass::pinMode(uint8_t pin, uint8_t mode)
+void GPIOClass::_pinMode(uint8_t pin, uint8_t mode)
 {
-	if (pin > lastPinNum) {
-		return;
+#if defined(MY_FIRMATA_CLIENT)	
+	switch (mode)
+	{
+	case INPUT:
+		digitalInputFeature.setPinMode(pin, INPUT);
+	case INPUT_PULLUP:
+		digitalInputFeature.setPinMode(pin, PIN_MODE_PULLUP);
+		break;
+	case OUTPUT:
+		digitalOutputFeature.setPinMode(pin, OUTPUT);
+	default:
+		break;
 	}
-	exportedPins[pin] = 1;
+#endif
 }
 
-void GPIOClass::digitalWrite(uint8_t pin, uint8_t value)
+void GPIOClass::_digitalWrite(uint8_t pin, uint8_t value)
 {
-	if (pin > lastPinNum) {
-		return;
-	}
-	if (0 == exportedPins[pin]) {
-		pinMode(pin, OUTPUT);
-	}
+#if defined(MY_FIRMATA_CLIENT)
+	digitalOutputFeature.setPinValue(pin, value != 0);
+#endif
 }
 
-uint8_t GPIOClass::digitalRead(uint8_t pin)
+uint8_t GPIOClass::_digitalRead(uint8_t pin)
 {
-	if (pin > lastPinNum) {
-		return 0;
-	}
-	if (0 == exportedPins[pin]) {
-		pinMode(pin, INPUT);
-	}
-	
-	uint8_t i = 0;
-	return i;
+#if defined(MY_FIRMATA_CLIENT)
+	return digitalInputFeature.getPinValue(pin);
+#else
+	return 0;
+#endif
 }
 
-uint8_t GPIOClass::digitalPinToInterrupt(uint8_t pin)
+uint16_t GPIOClass::_analogRead(uint8_t pin)
+{
+#if defined(MY_FIRMATA_CLIENT)
+	return analogInputFeature.getPinValue(pin);
+#else
+	return 0;
+#endif
+}
+
+void GPIOClass::_analogWrite(uint8_t pin, uint16_t value)
+{
+#if defined(MY_FIRMATA_CLIENT)
+	analogOutputFeature.setPinValue(pin, value);
+#endif
+}
+
+uint8_t GPIOClass::_digitalPinToInterrupt(uint8_t pin)
 {
 	return pin;
 }
@@ -87,12 +96,6 @@ uint8_t GPIOClass::digitalPinToInterrupt(uint8_t pin)
 GPIOClass& GPIOClass::operator=(const GPIOClass& other)
 {
 	if (this != &other) {
-		lastPinNum = other.lastPinNum;
-
-		exportedPins = new uint8_t[lastPinNum + 1];
-		for (int i = 0; i < lastPinNum + 1; ++i) {
-			exportedPins[i] = other.exportedPins[i];
-		}
 	}
 	return *this;
 }

@@ -21,9 +21,18 @@
 #define	GPIO_h
 
 #include <stdint.h>
+#if defined(MY_FIRMATA_CLIENT)
+#include "../MyFirmataClient/MyDigitalInputFirmata.h"
+#include "../MyFirmataClient/MyDigitalOutputFirmata.h"
+#include "../MyFirmataClient/MyAnalogInputFirmata.h"
+#include "../MyFirmataClient/MyAnalogOutputFirmata.h"
+#endif
 
 #define INPUT 0
 #define OUTPUT 1
+#define INPUT_PULLUP 2
+
+#define ANALOG 3
 
 #define LOW 0
 #define HIGH 1
@@ -53,28 +62,42 @@ public:
 	 * @param pin The number of the pin.
 	 * @param mode INPUT or OUTPUT.
 	 */
-	void pinMode(uint8_t pin, uint8_t mode);
+	void _pinMode(uint8_t pin, uint8_t mode);
 	/**
 	 * @brief Write a high or a low value for the given pin.
 	 *
 	 * @param pin number.
 	 * @param value HIGH or LOW.
 	 */
-	void digitalWrite(uint8_t pin, uint8_t value);
+	void _digitalWrite(uint8_t pin, uint8_t value);
 	/**
 	 * @brief Reads the value from a specified pin.
 	 *
 	 * @param pin The number of the pin.
 	 * @return HIGH or LOW.
 	 */
-	uint8_t digitalRead(uint8_t pin);
+	uint8_t _digitalRead(uint8_t pin);
+	/**
+	* @brief Reads the analog value from a specified analog pin.
+	*
+	* @param pin The number of the pin.
+	* @return analog value
+	*/
+	uint16_t _analogRead(uint8_t pin);
+	/**
+	* @brief Write the analog value to a specified PWM pin.
+	*
+	* @param pin The number of the pin.
+	* @param value analog
+	*/
+	void _analogWrite(uint8_t pin, uint16_t value);
 	/**
 	 * @brief Arduino compatibility function, returns the same given pin.
 	 *
 	 * @param pin The number of the pin.
 	 * @return The same parameter pin number.
 	 */
-	uint8_t digitalPinToInterrupt(uint8_t pin);
+	uint8_t _digitalPinToInterrupt(uint8_t pin);
 	/**
 	 * @brief Overloaded assign operator.
 	 *
@@ -82,8 +105,12 @@ public:
 	GPIOClass& operator=(const GPIOClass& other);
 
 private:
-	int lastPinNum; //!< @brief Highest pin number supported.
-	uint8_t *exportedPins; //!< @brief Array with information of which pins were exported.
+#if defined(MY_FIRMATA_CLIENT)
+	MyDigitalInputFirmata digitalInputFeature;
+	MyDigitalOutputFirmata digitalOutputFeature;
+	MyAnalogInputFirmata analogInputFeature;
+	MyAnalogOutputFirmata analogOutputFeature;
+#endif
 };
 
 extern GPIOClass GPIO;
