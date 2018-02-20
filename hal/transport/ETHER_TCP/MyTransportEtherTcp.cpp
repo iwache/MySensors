@@ -221,7 +221,7 @@ bool transportSend(const uint8_t to, const void* data, const uint8_t len, const 
 
 	_sendBufferCount = 0;
 	_sendBufferAdd(SOH); // Start of header by writing SOH
-	_sendBufferAdd(ETHER_PACKET); // ETHER Data packet telegram
+	_sendBufferAdd(ETHER_PACKET); // ETHER TCP Data packet telegram
 	cs += ETHER_PACKET;
 	_sendBufferAdd(to); // Destination address
 	cs += to;
@@ -255,9 +255,9 @@ bool transportInit(void)
 		_nodeId = BROADCAST_ADDRESS;
 	}
 
-	if (_dev.connect(MY_ETHER_SERVER, MY_ETHER_SERVER_PORT)) {
+	if (_dev.connect(MY_ETHER_TCP_SERVER, MY_ETHER_TCP_PORT)) {
 		
-		logDebug("Connected to My ETHER Server\n");
+		logDebug("Connected to My ETHER TCP Server\n");
 		
 		_serialReset();
 		return true;
@@ -269,7 +269,7 @@ void transportSetAddress(const uint8_t address)
 {
 	_nodeId = address;
 
-	logDebug("Send address to ETHER server: %u\n", _nodeId);
+	logDebug("Send address to ETHER TCP server: %u\n", _nodeId);
 
 	_dev.write(SOH); // Start of header by writing SOH
 	_dev.write(ETHER_ADDR); // Set ETHER address telegram

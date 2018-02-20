@@ -268,7 +268,7 @@ MY_DEFAULT_RX_LED_PIN in your sketch instead to enable LEDs
 #else
 #define __RS485CNT 0	//!< __RS485CNT
 #endif
-#if defined(MY_ETHER)
+#if defined(MY_ETHER_TCP)
 #define __ETHERCNT 1	//!< __RS485CNT
 #else
 #define __ETHERCNT 0	//!< __RS485CNT
@@ -285,7 +285,7 @@ MY_DEFAULT_RX_LED_PIN in your sketch instead to enable LEDs
 #endif
 
 // TRANSPORT INCLUDES
-#if defined(MY_RADIO_RF24) || defined(MY_RADIO_NRF5_ESB) || defined(MY_RADIO_RFM69) || defined(MY_RADIO_RFM95) || defined(MY_RS485) || defined(MY_ETHER)
+#if defined(MY_RADIO_RF24) || defined(MY_RADIO_NRF5_ESB) || defined(MY_RADIO_RFM69) || defined(MY_RADIO_RFM95) || defined(MY_RS485) || defined(MY_ETHER_TCP)
 #include "hal/transport/MyTransportHAL.h"
 #include "core/MyTransport.h"
 
@@ -369,8 +369,8 @@ MY_DEFAULT_RX_LED_PIN in your sketch instead to enable LEDs
 #elif defined(MY_RADIO_RFM95)
 #include "drivers/RFM95/RFM95.cpp"
 #include "hal/transport/RFM95/MyTransportRFM95.cpp"
-#elif defined(MY_ETHER)
-#include "hal/transport/MyTransportEther.cpp"
+#elif defined(MY_ETHER_TCP)
+#include "hal/transport/ETHER_TCP/MyTransportEtherTcp.cpp"
 #endif
 
 // PASSIVE MODE

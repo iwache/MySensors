@@ -249,36 +249,36 @@
 
 
 /**
- * @defgroup EtherSettingGrpPub ETHER
+ * @defgroup EtherTcpSettingGrpPub ETHER_TCP
  * @ingroup RadioSettingGrpPub
- * @brief These options are specific to the ETHER ethernet via TCP transport.
+ * @brief These options are specific to the Ethernet via TCP transport.
  * @{
  */
 
 /**
- * @def MY_ETHER
- * @brief Define this to use the ETHER ethernet transport for sensor network communication.
+ * @def MY_ETHER_TCP
+ * @brief Define this to use the Ethernet via TCP transport for sensor network communication.
  */
-//#define MY_ETHER
+//#define MY_ETHER_TCP
 
-// MY_ETHER server information
+// MY_ETHER_TCP server information
 
 /**
- * @def MY_ETHER_SERVER
- * @brief The ETHER ethernet server name or server IP.
+ * @def MY_ETHER_TCP_SERVER
+ * @brief The ETHER_TCP server name or server IP.
  */
-#ifndef MY_ETHER_SERVER
-#define MY_ETHER_SERVER "localhost"
+#ifndef MY_ETHER_TCP_SERVER
+#define MY_ETHER_TCP_SERVER "localhost"
 #endif
 
 /**
-* @def MY_ETHER_SERVER_PORT
-* @brief The ETHER ethernet server IP port.
+* @def MY_ETHER_TCP_PORT
+* @brief The ETHER_TCP server IP port.
 */
-#ifndef MY_ETHER_SERVER_PORT
-#define MY_ETHER_SERVER_PORT (5445)
+#ifndef MY_ETHER_TCP_PORT
+#define MY_ETHER_TCP_PORT (5445)
 #endif
-/** @}*/ // End of EtherSettingGrpPub group
+/** @}*/ // End of EtherTcpSettingGrpPub group
 
 /**
  * @defgroup RF24SettingGrpPub RF24
@@ -2024,7 +2024,7 @@
 #endif
 
 // Enable sensor network "feature" if one of the transport types was enabled
-#if defined(MY_RADIO_RF24) || defined(MY_RADIO_NRF5_ESB) || defined(MY_RADIO_RFM69) || defined(MY_RADIO_RFM95) || defined(MY_RS485) || defined(MY_ETHER)
+#if defined(MY_RADIO_RF24) || defined(MY_RADIO_NRF5_ESB) || defined(MY_RADIO_RFM69) || defined(MY_RADIO_RFM95) || defined(MY_RS485) || defined(MY_ETHER_TCP)
 #define MY_SENSOR_NETWORK
 #endif
 
@@ -2153,10 +2153,10 @@
 // RS485
 #define MY_RS485
 #define MY_RS485_HWSERIAL (Serial1)
-// ETHER
-#define MY_ETHER
-#define MY_ETHER_SERVER "localhost"
-#define MY_ETHER_SERVER_PORT (5445)
+// ETHER TCP
+#define MY_ETHER_TCP
+#define MY_ETHER_TCP_SERVER "localhost"
+#define MY_ETHER_TCP_PORT (5445)
 // RF24
 #define MY_RADIO_RF24
 #define MY_DEBUG_VERBOSE_RF24
