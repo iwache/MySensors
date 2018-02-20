@@ -427,7 +427,7 @@ MY_DEFAULT_RX_LED_PIN in your sketch instead to enable LEDs
 #elif defined(__linux__)
 #include "hal/architecture/Linux/MyMainLinuxGeneric.cpp"
 #elif defined(WIN32)
-#include "hal/architecture/Win32/MyMainWin32.cpp"
+#include "hal/architecture/Win32/MyMainWin32Generic.cpp"
 #elif defined(ARDUINO_ARCH_STM32F1)
 #include "hal/architecture/STM32F1/MyMainSTM32F1.cpp"
 #elif defined(TEENSYDUINO)

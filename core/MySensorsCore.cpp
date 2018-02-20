@@ -97,9 +97,14 @@ void _begin(void)
 #if defined(MY_CORE_ONLY)
 	// initialize HW and run setup if present
 	(void)hwInit();
+#if defined(WIN32)
+	// Visual C++ has no weak function support
+	setup();
+#else
 	if (setup) {
 		setup();
 	}
+#endif
 	return;
 #endif
 	// reset wdt
