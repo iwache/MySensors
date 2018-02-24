@@ -89,6 +89,7 @@
 #include "Wendy3x5.h"
 #include "newbasic3x5.h"
 
+#include "LiquidMenu8x16.h"		// Font for LiquidMenu library to emulate a 16x4 LCD display
 /*
  * These fonts require no-pad rendering code
  */
