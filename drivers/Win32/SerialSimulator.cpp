@@ -60,3 +60,8 @@ void SerialSimulator::end()
 {
 	flush();
 }
+
+SerialSimulator::operator bool()
+{
+	return true;
+}

@@ -20,7 +20,6 @@
 #include "log.h"
 #include <stdio.h>
 #include <stdint.h>
- // TODO: #iwa #include <syslog.h>
 #include <stdarg.h>
 
 #define LOG_INFO 0

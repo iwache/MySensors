@@ -20,12 +20,12 @@
  */
 
 #include "SPIDEV.h"
-#include <fcntl.h>
- // TODO: #iwa #include <pthread.h>
-#include <stdlib.h>
-#include <string.h>
- // TODO: #iwa #include <sys/ioctl.h>
- // TODO: #iwa #include <unistd.h>
+//#include <fcntl.h>
+// TODO: #iwa #include <pthread.h>
+//#include <stdlib.h>
+//#include <string.h>
+// TODO: #iwa #include <sys/ioctl.h>
+// TODO: #iwa #include <unistd.h>
 #include "log.h"
 
 //static pthread_mutex_t spiMutex = PTHREAD_MUTEX_INITIALIZER;

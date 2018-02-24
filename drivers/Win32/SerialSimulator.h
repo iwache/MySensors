@@ -71,6 +71,12 @@ public:
 	 * @brief Nothing to do, flush stdout.
 	 */
 	void end();
+	/**
+	* @brief Overloaded cast operators.
+	*
+	* Allow Serial objects to be used where a bool is expected.
+	*/
+	virtual operator bool();
 };
 
 #endif

@@ -17,93 +17,27 @@
  * version 2 as published by the Free Software Foundation.
  */
 
-
-#include <time.h>
-#include <time.h>
+#include "Arduino.h"
 #include <stdlib.h>
 
-#include <windows.h>
-
-//#include <winsock.h>
-//#include <winnt.h>
-//#include <minwindef.h>
-//#include <minwinbase.h>
-//#include <timezoneapi.h>
-//#include <sysinfoapi.h>
-
-#include "Arduino.h"
-
-#if defined(MY_PROCESS_SYNCHRONIZATION)
 ProcessSynchronizationWrapper processSynchronizationWrapper;
-#endif
-
-const __int64 DELTA_EPOCH_IN_MICROSECS = 11644473600000000;
-
-int gettimeofday(struct timeval *tv)
-{
-	FILETIME ft;
-	__int64 tmpres = 0;
-	TIME_ZONE_INFORMATION tz_winapi;
-	int rez = 0;
-
-	ZeroMemory(&ft, sizeof(ft));
-	ZeroMemory(&tz_winapi, sizeof(tz_winapi));
-
-	GetSystemTimeAsFileTime(&ft);
-
-	tmpres = ft.dwHighDateTime;
-	tmpres <<= 32;
-	tmpres |= ft.dwLowDateTime;
-
-	/*converting file time to unix epoch*/
-	tmpres /= 10;  /*convert into microseconds*/
-	tmpres -= DELTA_EPOCH_IN_MICROSECS;
-	tv->tv_sec = (__int32)(tmpres*0.000001);
-	tv->tv_usec = (tmpres % 1000000);
-
-	return 0;
-}
-
-// For millis()
-static unsigned long millis_at_start = 0;
 
 void yield(void) {}
 
 unsigned long millis(void)
 {
-#if defined(MY_PROCESS_SYNCHRONIZATION)
 	return processSynchronizationWrapper.millis();
-#else
-	timeval curTime;
-
-	if (millis_at_start == 0) {
-		gettimeofday(&curTime);
-		millis_at_start = curTime.tv_sec;
-	}
-
-	gettimeofday(&curTime);
-	return ((curTime.tv_sec - millis_at_start) * 1000) + (curTime.tv_usec / 1000);
-#endif
 }
 
 unsigned long micros()
 {
-	timeval curTime;
-
-	if (millis_at_start == 0) {
-		gettimeofday(&curTime);
-		millis_at_start = curTime.tv_sec;
-	}
-
-	gettimeofday(&curTime);
-	return ((curTime.tv_sec - millis_at_start) * 1000000) + (curTime.tv_usec);
-
+	// ToDo: extend ProcessSynchronizationWrapper with micros() method
 	return 0;
 }
 
 void _delay_milliseconds(unsigned int millis)
 {
-	Sleep(millis);
+	_sleep(millis);
 }
 
 void _delay_milliseconds_and_proc_sync(unsigned int millis)
@@ -111,7 +45,7 @@ void _delay_milliseconds_and_proc_sync(unsigned int millis)
 #if defined(MY_PROCESS_SYNCHRONIZATION)
 	processSynchronizationWrapper.wait(millis);
 #else
-	Sleep(millis);
+	_sleep(millis);
 #endif
 }
 

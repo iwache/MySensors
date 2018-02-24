@@ -18,10 +18,6 @@
  */
 
 #include "GPIO.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/types.h>
 
 // Declare a single default instance
 GPIOClass GPIO = GPIOClass();

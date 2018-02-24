@@ -38,11 +38,9 @@
 #define MySensors_h
 
 #ifdef __cplusplus
- // Additional includes for Visual C++ compiler
-#if defined(WIN32)
-#include "drivers/Win32/includes.cpp"
-#endif
+#if !defined(WIN32)
 #include <Arduino.h>
+#endif
 #endif
 
 // general macros
@@ -51,14 +49,12 @@
 #endif
 
 #include "MyConfig.h"
+#if defined(WIN32)
+// Additional includes for Visual C++ compiler
+#include "drivers/Win32/vcIncludes/includes.h"
+#endif
 #include "core/MySplashScreen.h"
 #include "core/MySensorsCore.h"
-
-#if defined(MY_FIRMATA_CLIENT)
-// ToDo: create includes file for MyFirmata client
-//#include "drivers/MyFirmataClient/includes.cpp"
-#endif
-
 
 // OTA Debug, has to be defined before HAL
 #if defined(MY_OTA_LOG_SENDER_FEATURE) || defined(MY_OTA_LOG_RECEIVER_FEATURE)

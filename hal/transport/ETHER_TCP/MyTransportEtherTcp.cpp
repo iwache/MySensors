@@ -18,7 +18,6 @@
  *
  ********************************************************************************/
 
-#include "MyTransportHAL.h"
 #include <EthernetClient.h>
 
 // We only use SYS_PACK in this application

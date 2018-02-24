@@ -17,8 +17,6 @@
 #ifndef MyFirmataFeature_h
 #define MyFirmataFeature_h
 
-#include "MyFirmataClass.h"
-
 class MyFirmataFeature
 {
   public:

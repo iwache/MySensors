@@ -20,14 +20,6 @@
 #ifndef GPIO_h
 #define	GPIO_h
 
-#include <stdint.h>
-#if defined(MY_FIRMATA_CLIENT)
-#include "../MyFirmataClient/MyDigitalInputFirmata.h"
-#include "../MyFirmataClient/MyDigitalOutputFirmata.h"
-#include "../MyFirmataClient/MyAnalogInputFirmata.h"
-#include "../MyFirmataClient/MyAnalogOutputFirmata.h"
-#endif
-
 #define INPUT 0
 #define OUTPUT 1
 #define INPUT_PULLUP 2

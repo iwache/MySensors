@@ -29,7 +29,7 @@
 // TODO: #iwa #include <getopt.h>
 
 #include <log.h>
-#include "MySensorsCore.h"
+#include "../../core/MySensorsCore.h"
 
 void handle_sigint(int sig)
 {

@@ -29,10 +29,10 @@
 #include <math.h>
 #include <string>
 #include <algorithm>
-#include "stdlib_noniso.h"
-#include "ProcessSynchronizationWrapper.h"
 
-#include "GPIO.h"
+#include "stdlib_noniso.h"
+#include <ProcessSynchronizationWrapper.h>
+
 #define pinMode(pin, direction) GPIO._pinMode(pin, direction)
 #define digitalWrite(pin, value) GPIO._digitalWrite(pin, value)
 #define digitalRead(pin) GPIO._digitalRead(pin)
@@ -54,6 +54,7 @@
 #define pgm_read_byte(p) (*(p))
 #define pgm_read_dword(p) (*(p))
 #define pgm_read_byte_near(p) (*(p))
+#define strlen_P strlen
 
 #define PI 3.1415926535897932384626433832795
 #define HALF_PI 1.5707963267948966192313216916398
@@ -98,6 +99,8 @@ using std::abs;
 typedef uint8_t byte;
 typedef string String;
 typedef char __FlashStringHelper;
+typedef uint8_t boolean;
+
 
 void yield(void);
 unsigned long millis(void);
@@ -109,8 +112,6 @@ long randMax(long howbig);
 long randMinMax(long howsmall, long howbig);
 void _delay_milliseconds_and_proc_sync(unsigned int millis);
 
-#if defined(MY_PROCESS_SYNCHRONIZATION)
 extern ProcessSynchronizationWrapper processSynchronizationWrapper;
-#endif
 
 #endif
