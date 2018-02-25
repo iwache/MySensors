@@ -20,19 +20,25 @@
 #include "Arduino.h"
 #include <stdlib.h>
 
+TimingWrapper timingWrapper;
+#if defined(MY_PROCESS_SYNCHRONIZATION)
 ProcessSynchronizationWrapper processSynchronizationWrapper;
+#endif
 
 void yield(void) {}
 
 unsigned long millis(void)
 {
+#if defined(MY_PROCESS_SYNCHRONIZATION)
 	return processSynchronizationWrapper.millis();
+#else
+	return timingWrapper.millis();
+#endif
 }
 
 unsigned long micros()
 {
-	// ToDo: extend ProcessSynchronizationWrapper with micros() method
-	return 0;
+	return timingWrapper.micros();
 }
 
 void _delay_milliseconds(unsigned int millis)

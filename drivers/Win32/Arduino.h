@@ -32,6 +32,7 @@
 
 #include "stdlib_noniso.h"
 #include <ProcessSynchronizationWrapper.h>
+#include <TimingWrapper.h>
 
 #define pinMode(pin, direction) GPIO._pinMode(pin, direction)
 #define digitalWrite(pin, value) GPIO._digitalWrite(pin, value)
@@ -112,6 +113,9 @@ long randMax(long howbig);
 long randMinMax(long howsmall, long howbig);
 void _delay_milliseconds_and_proc_sync(unsigned int millis);
 
+extern TimingWrapper timingWrapper;
+#if defined(MY_PROCESS_SYNCHRONIZATION)
 extern ProcessSynchronizationWrapper processSynchronizationWrapper;
+#endif
 
 #endif
