@@ -128,27 +128,15 @@ bool _socketProcess()
 				_recSender = _header[3];
 				_recNoAck = _header[4];
 				_recLen = _header[5];
-
+#if defined(WIN32)
+				// ToDo: replace logDebug by correct MySensors debug messages for transport layer
 				logDebug("Packet header received: from %u; len %u\n", _recSender, _recLen);
-
+#endif
 				for (i = 1; i < 6; i++) {
 					_recCalcCS += _header[i];
 				}
 				_recPhase = 1;
 				_recPos = 0;
-
-				////Check if we should process this message
-				////We reject the message if we are the sender
-				////We reject if we are not the receiver and message is not a broadcast
-				//if ((_recSender == _nodeId) ||
-				//	(_recStation != _nodeId &&
-				//		_recStation != BROADCAST_ADDRESS)) {
-				//	logDebug("Packet process rejected: to %u; my node id %u\n", _recStation, _nodeId);
-
-				//	_serialReset();
-				//	break;
-				//}
-
 				if (_recLen == 0) {
 					_recPhase = 2;
 				}
@@ -192,12 +180,14 @@ bool _socketProcess()
 					_packet_from = _recSender;
 					_packet_len = _recLen;
 					_packet_received = true;
-
+#if defined(WIN32)
 					logDebug("Packet accepted\n");
-
+#endif
 					//break;
 				} else {
+#if defined(WIN32)
 					logDebug("Packet has wrong checksum\n");
+#endif
 				}
 			}
 			//Clear the data
@@ -215,9 +205,9 @@ bool transportSend(const uint8_t to, const void* data, const uint8_t len, const 
 	unsigned char i;
 	unsigned char cs = 0;
 	unsigned char noAck = noACK ? 0 : 1;
-
+#if defined(WIN32)
 	logDebug("Transport send to: %u len: %u\n", to, len);
-
+#endif
 	_sendBufferCount = 0;
 	_sendBufferAdd(SOH); // Start of header by writing SOH
 	_sendBufferAdd(ETHER_PACKET); // ETHER TCP Data packet telegram
@@ -255,9 +245,9 @@ bool transportInit(void)
 	}
 
 	if (_dev.connect(MY_ETHER_TCP_SERVER, MY_ETHER_TCP_PORT)) {
-		
+#if defined(WIN32)		
 		logDebug("Connected to My ETHER TCP Server\n");
-		
+#endif		
 		_serialReset();
 		return true;
 	}
@@ -267,9 +257,9 @@ bool transportInit(void)
 void transportSetAddress(const uint8_t address) 
 {
 	_nodeId = address;
-
+#if defined(WIN32)
 	logDebug("Send address to ETHER TCP server: %u\n", _nodeId);
-
+#endif
 	_dev.write(SOH); // Start of header by writing SOH
 	_dev.write(ETHER_ADDR); // Set ETHER address telegram
 	_dev.write(_nodeId); // Source address
