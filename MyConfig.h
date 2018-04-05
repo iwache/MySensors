@@ -1346,6 +1346,8 @@
  * @brief Define this for Ethernet GW based on Linux.
  * @def MY_GATEWAY_WIFI101
  * @brief Define this for Ethernet GW based on Arduino WiFi101 (MKR1000).
+ * @def MY_GATEWAY_TINYGSM
+ * @brief Define this for Ethernet GW based on GSM modems supported by TinyGSM library.
  */
 // The gateway options available
 //#define MY_GATEWAY_W5100
@@ -1353,6 +1355,7 @@
 //#define MY_GATEWAY_ESP8266
 //#define MY_GATEWAY_LINUX
 //#define MY_GATEWAY_WIFI101
+//#define MY_GATEWAY_TINYGSM
 
 
 /**
@@ -1658,6 +1661,23 @@
 #endif
 
 /**
+ * @def MY_LOCK_DEVICE
+ * @brief Enable read back protection
+ *
+ * Enable read back protection feature. Currently only supported by NRF51+NRF52.
+ * Use this flag to protect signing and encryption keys stored in the MCU.
+ *
+ * Set this flag, when you use softsigning in MySensors. Don't set this
+ * in SecurityPersonalizer.
+ *
+ * @warning YOU CAN BRICK YOUR DEVICE!!!
+ *          Don't set this flag without having an boot loader, OTA firmware update and
+ *          an Gateway connection. To reset an device, you can try >>
+ *          openocd -f interface/cmsis-dap.cfg -f target/nrf52.cfg -c "program dap apreg 1 0x04 0x01"
+ */
+//#define MY_LOCK_DEVICE
+
+/**
  * @def MY_SIGNING_FEATURE
  * @ingroup internals
  * @brief Helper flag to indicate that some signing feature is enabled
@@ -1859,7 +1879,7 @@
  * @note For now the configuration file is only used to store the emulated eeprom state.
  */
 #ifndef MY_LINUX_CONFIG_FILE
-#define MY_LINUX_CONFIG_FILE "/etc/mysensors.dat"
+#define MY_LINUX_CONFIG_FILE "/etc/mysensors.conf"
 #endif
 /** @}*/ // End of LinuxSettingGrpPub group
 /** @}*/ // End of PlatformSettingGrpPub group
@@ -1874,7 +1894,7 @@
  * MY_IS_GATEWAY is true when @ref MY_GATEWAY_FEATURE is set.
  * MY_NODE_TYPE contain a string describing the class of sketch/node (gateway/repeater/node).
  */
-#if defined(MY_GATEWAY_SERIAL) || defined(MY_GATEWAY_W5100) || defined(MY_GATEWAY_ENC28J60) || defined(MY_GATEWAY_ESP8266) || defined(MY_GATEWAY_LINUX) || defined(MY_GATEWAY_WIFI101) || defined(MY_GATEWAY_MQTT_CLIENT)
+#if defined(MY_GATEWAY_SERIAL) || defined(MY_GATEWAY_W5100) || defined(MY_GATEWAY_ENC28J60) || defined(MY_GATEWAY_ESP8266) || defined(MY_GATEWAY_LINUX) || defined(MY_GATEWAY_WIFI101) || defined(MY_GATEWAY_MQTT_CLIENT) || defined(MY_GATEWAY_TINYGSM)
 #define MY_GATEWAY_FEATURE
 #define MY_IS_GATEWAY (true)
 #define MY_NODE_TYPE "GW"
@@ -2026,6 +2046,7 @@
 #define MY_INDICATION_HANDLER
 #define MY_DISABLE_REMOTE_RESET
 #define MY_DISABLE_RAM_ROUTING_TABLE_FEATURE
+#define MY_LOCK_DEVICE
 // core
 #define MY_CORE_ONLY
 // GW
@@ -2037,9 +2058,51 @@
 #define MY_GATEWAY_ESP8266
 #define MY_GATEWAY_LINUX
 #define MY_GATEWAY_WIFI101
+#define MY_GATEWAY_TINYGSM
 #define MY_IP_ADDRESS 192,168,178,66
 #define MY_USE_UDP
 #define MY_CONTROLLER_IP_ADDRESS 192,168,178,254
+// TinyGSM
+/**
+ * @def MY_GSM_APN
+ * @brief APN from your cell carrier / mobile provider. Example: 4g.tele2.se
+ */
+#define MY_GSM_APN
+/**
+ * @def MY_GSM_BAUDRATE
+ * @brief Baudrate for your GSM modem. If left undefined, TinyGSM will try to auto detect the correct rate
+ */
+#define MY_GSM_BAUDRATE
+/**
+ * @def MY_GSM_PIN
+ * @brief PIN code for your SIM card, if PIN lock is active.
+ */
+#define MY_GSM_PIN
+/**
+ * @def MY_GSM_PSW
+ * @brief If using a GSM modem, this is the password supplied by your cell carrier / mobile provider. If using ESP8266 as a WiFi modem, this is your WiFi network password
+ */
+#define MY_GSM_PSW
+/**
+ * @def MY_GSM_RX
+ * @brief If defined, uses softSerial using defined pins (must also define MY_GSM_TX)
+ */
+#define MY_GSM_RX
+/**
+ * @def MY_GSM_SSID
+ * @brief If using ESP8266 as WiFi modem, this is your network SSID
+ */
+#define MY_GSM_SSID
+/**
+ * @def MY_GSM_TX
+ * @brief If defined, uses softSerial using defined pins (must also define MY_GSM_RX)
+ */
+#define MY_GSM_TX
+/**
+ * @def MY_GSM_USR
+ * @brief Supplied by your cell carrier / mobile operator. If not required, leave undefined.
+ */
+#define MY_GSM_USR
 // LED
 #define MY_DEFAULT_ERR_LED_PIN
 #define MY_DEFAULT_TX_LED_PIN
