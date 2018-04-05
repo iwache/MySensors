@@ -19,49 +19,22 @@
  *******************************
  *
  * REVISION HISTORY
- * Version 1.0 - Henrik Ekblad
+ * Version 1.0 - Rait Lotamõis
  *
  * DESCRIPTION
- * The ESP8266 MQTT gateway sends radio network (or locally attached sensors) data to your MQTT broker.
+ * The TinyGSM MQTT gateway sends radio network (or locally attached sensors) data to your MQTT broker using a GSM modem or optionally an ESP8266 as a WiFi modem.
  * The node also listens to MY_MQTT_TOPIC_PREFIX and sends out those messages to the radio network
  *
  * LED purposes:
- * - To use the feature, uncomment any of the MY_DEFAULT_xx_LED_PINs in your sketch
+ * - To use the feature, uncomment WITH_LEDS_BLINKING in MyConfig.h
  * - RX (green) - blink fast on radio message recieved. In inclusion mode will blink fast only on presentation recieved
  * - TX (yellow) - blink fast on radio message transmitted. In inclusion mode will blink slowly
  * - ERR (red) - fast blink on error during transmission error or recieve crc error
- *
- * See http://www.mysensors.org/build/esp8266_gateway for wiring instructions.
- * nRF24L01+  ESP8266
- * VCC        VCC
- * CE         GPIO4
- * CSN/CS     GPIO15
- * SCK        GPIO14
- * MISO       GPIO12
- * MOSI       GPIO13
- *
- * Not all ESP8266 modules have all pins available on their external interface.
- * This code has been tested on an ESP-12 module.
- * The ESP8266 requires a certain pin configuration to download code, and another one to run code:
- * - Connect REST (reset) via 10K pullup resistor to VCC, and via switch to GND ('reset switch')
- * - Connect GPIO15 via 10K pulldown resistor to GND
- * - Connect CH_PD via 10K resistor to VCC
- * - Connect GPIO2 via 10K resistor to VCC
- * - Connect GPIO0 via 10K resistor to VCC, and via switch to GND ('bootload switch')
- *
-  * Inclusion mode button:
- * - Connect GPIO5 (=D1) via switch to GND ('inclusion switch')
- *
- * Hardware SHA204 signing is currently not supported!
- *
- * Make sure to fill in your ssid and WiFi password below for ssid & pass.
  */
+
 
 // Enable debug prints to serial monitor
 #define MY_DEBUG
-
-// Use a bit lower baudrate for serial prints on ESP8266 than default in MyConfig.h
-#define MY_BAUD_RATE 9600
 
 // Enables and select radio type (if attached)
 #define MY_RADIO_NRF24
@@ -69,7 +42,36 @@
 //#define MY_RADIO_RFM95
 
 #define MY_GATEWAY_MQTT_CLIENT
-#define MY_GATEWAY_ESP8266
+
+// Enable GSM modem support
+#define MY_GATEWAY_TINYGSM
+
+// Define your modem
+#define TINY_GSM_MODEM_SIM800
+// #define TINY_GSM_MODEM_SIM808
+// #define TINY_GSM_MODEM_SIM900
+// #define TINY_GSM_MODEM_A6
+// #define TINY_GSM_MODEM_A7
+// #define TINY_GSM_MODEM_M590
+// #define TINY_GSM_ESP8266
+
+// leave empty anything that does not apply
+#define MY_GSM_APN	"internet"
+//#define MY_GSM_PIN	"1234"
+#define MY_GSM_USR	""
+//If using a GSM modem, this stands for your GSM connection password. If using WiFi, it's your wireless password.
+#define MY_GSM_PSW	""
+//#define MY_GSM_SSID ""
+
+// Use Hardware Serial on Mega, Leonardo, Micro
+//#define SerialAT Serial1
+// or Software Serial on Uno, Nano
+#include <SoftwareSerial.h>
+#define MY_GSM_RX 4
+#define MY_GSM_TX 5
+
+// If your Mosquitto is old fashioned and does not support 3.1.1
+//#define MQTT_VERSION MQTT_VERSION_3_1
 
 // Set this node's subscribe and publish topic prefix
 #define MY_MQTT_PUBLISH_TOPIC_PREFIX "mygateway1-out"
@@ -82,62 +84,54 @@
 //#define MY_MQTT_USER "username"
 //#define MY_MQTT_PASSWORD "password"
 
-// Set WIFI SSID and password
-#define MY_ESP8266_SSID "MySSID"
-#define MY_ESP8266_PASSWORD "MyVerySecretPassword"
-
-// Set the hostname for the WiFi Client. This is the hostname
-// it will pass to the DHCP server if not static.
-// #define MY_ESP8266_HOSTNAME "mqtt-sensor-gateway"
-
 // Enable MY_IP_ADDRESS here if you want a static ip address (no DHCP)
-//#define MY_IP_ADDRESS 192,168,178,87
+//#define MY_IP_ADDRESS 192,168,32,220
 
 // If using static ip you can define Gateway and Subnet address as well
-//#define MY_IP_GATEWAY_ADDRESS 192,168,178,1
+//#define MY_IP_GATEWAY_ADDRESS 192,168,32,1
 //#define MY_IP_SUBNET_ADDRESS 255,255,255,0
 
-// MQTT broker ip address.
+// MQTT broker ip address or url. Define one or the other.
+//#define MY_CONTROLLER_URL_ADDRESS "mymqttbroker.com"
 #define MY_CONTROLLER_IP_ADDRESS 192, 168, 178, 68
-
-//MQTT broker if using URL instead of ip address.
-// #define MY_CONTROLLER_URL_ADDRESS "test.mosquitto.org"
 
 // The MQTT broker port to to open
 #define MY_PORT 1883
 
+/*
 // Enable inclusion mode
-//#define MY_INCLUSION_MODE_FEATURE
+#define MY_INCLUSION_MODE_FEATURE
 // Enable Inclusion mode button on gateway
 //#define MY_INCLUSION_BUTTON_FEATURE
 // Set inclusion mode duration (in seconds)
-//#define MY_INCLUSION_MODE_DURATION 60
+#define MY_INCLUSION_MODE_DURATION 60
 // Digital pin used for inclusion mode button
-//#define MY_INCLUSION_MODE_BUTTON_PIN D1
+//#define MY_INCLUSION_MODE_BUTTON_PIN  3
 
 // Set blinking period
-//#define MY_DEFAULT_LED_BLINK_PERIOD 300
+#define MY_DEFAULT_LED_BLINK_PERIOD 300
 
 // Flash leds on rx/tx/err
+// Uncomment to override default HW configurations
 //#define MY_DEFAULT_ERR_LED_PIN 16  // Error led pin
 //#define MY_DEFAULT_RX_LED_PIN  16  // Receive led pin
 //#define MY_DEFAULT_TX_LED_PIN  16  // the PCB, on board LED
+*/
 
-#include <ESP8266WiFi.h>
 #include <MySensors.h>
 
 void setup()
 {
-	// Setup locally attached sensors
+    // Setup locally attached sensors
 }
 
 void presentation()
 {
-	// Present locally attached sensors here
+    // Present locally attached sensors here
 }
 
 void loop()
 {
-	// Send locally attech sensors data here
+    // Send locally attached sensors data here
 }
 
